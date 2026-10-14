@@ -1,10 +1,10 @@
-﻿<div align="center">
+<div align="center">
 
-# KrishiShetra — कृषि क्षेत्र
+# KhetSetu
 
 **Market intelligence and digital trade workflows for India's agricultural community.**
 
-KrishiShetra helps farmers compare mandi prices after estimated transport costs, publish produce lots, connect with buyers, and manage the steps from negotiation through delivery. Separate portals support buyers, Farmer Producer Organizations (FPOs), transporters, and administrators.
+KhetSetu helps farmers compare mandi prices after estimated transport costs, publish produce lots, connect with buyers, and manage the steps from negotiation through delivery. Separate portals support buyers, Farmer Producer Organizations (FPOs), transporters, and administrators.
 
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![Express](https://img.shields.io/badge/Express-4-000000?logo=express&logoColor=white)](https://expressjs.com/)
@@ -17,7 +17,7 @@ KrishiShetra helps farmers compare mandi prices after estimated transport costs,
 
 ## What the project does
 
-Agricultural sellers often have to make decisions with incomplete information: which market offers the best return after freight, which buyers need their crop, and whether storage costs are justified by a possible later sale. KrishiShetra brings these workflows into one web platform.
+Agricultural sellers often have to make decisions with incomplete information: which market offers the best return after freight, which buyers need their crop, and whether storage costs are justified by a possible later sale. KhetSetu brings these workflows into one web platform.
 
 A farmer can review market prices, compare estimated net realization across mandis, create a graded crop lot, respond to buyer offers, follow an order, request storage, or raise a dispute. Buyers can search available lots and negotiate. FPOs can coordinate member supply and help oversee trade issues. Transporters can find loads and manage trip milestones. Administrators can review users and platform activity.
 
