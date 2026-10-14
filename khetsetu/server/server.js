@@ -1,0 +1,204 @@
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+
+const healthRoutes = require('./routes/health.routes');
+const authRoutes = require('./routes/auth.routes');
+const farmerRoutes = require('./routes/farmer.routes');
+const buyerRoutes = require('./routes/buyer.routes');
+const { marketRouter: buyerMarketRoutes, savedLotsRouter: buyerSavedLotsRoutes } = require('./routes/buyer.market.routes');
+const inquiryRoutes = require('./routes/inquiry.routes');
+const orderRoutes = require('./routes/order.routes');
+const transportRoutes = require('./routes/transport.routes');
+const notificationRoutes = require('./routes/notification.routes');
+const activityRoutes = require('./routes/activity.routes');
+const lotRoutes = require('./routes/lot.routes');
+const marketRoutes = require('./routes/market.routes');
+const offerRoutes = require('./routes/offer.routes');
+const storageRoutes = require('./routes/storage.routes');
+const decisionRoutes = require('./routes/decision.routes');
+const disputeRoutes = require('./routes/dispute.routes');
+const qualityRoutes = require('./routes/quality.routes');
+const auditRoutes = require('./routes/audit.routes');
+const connectDB = require('./config/db');
+const { seedInitialFacilities } = require('./controllers/storage.controller');
+const { startOutboxWorker } = require('./services/evmAuditService');
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Connect to MySQL & Seed initial storage facilities
+connectDB().then(() => {
+  seedInitialFacilities();
+  startOutboxWorker();
+}).catch(() => {
+  seedInitialFacilities();
+});
+
+// Dynamic Production & Development CORS Configuration
+const allowedOrigins = [
+  'http://localhost:5000',
+  'http://localhost:3000',
+  'http://localhost:5500',
+  'http://localhost:8080',
+  'http://127.0.0.1:5500',
+  'http://127.0.0.1:5000',
+  'http://127.0.0.1:3000'
+];
+
+if (process.env.FRONTEND_URL) {
+  const envOrigins = process.env.FRONTEND_URL.split(',').map(url => url.trim().replace(/\/+$/, '')).filter(Boolean);
+  allowedOrigins.push(...envOrigins);
+}
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, server-to-server, curl, same-origin)
+    if (!origin) return callback(null, true);
+
+    let isAllowed = allowedOrigins.includes(origin) ||
+      /^http:\/\/localhost(:\d+)?$/.test(origin) ||
+      /^http:\/\/127\.0\.0\.1(:\d+)?$/.test(origin);
+
+    if (!isAllowed) {
+      try {
+        const urlObj = new URL(origin);
+        const host = urlObj.hostname.toLowerCase();
+        if (
+          host.endsWith('.onrender.com') ||
+          host.endsWith('.vercel.app') ||
+          host.endsWith('.netlify.app') ||
+          host.endsWith('.github.io') ||
+          host === 'localhost' ||
+          host === '127.0.0.1'
+        ) {
+          isAllowed = true;
+        }
+      } catch (e) {}
+    }
+
+    callback(null, isAllowed);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
+app.use(express.json({ limit: '10mb' }));
+
+app.use((err, req, res, next) => {
+  if (err && err.type === 'entity.parse.failed') {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid JSON payload. Please check the request body format.'
+    });
+  }
+  next(err);
+});
+
+// Routes
+app.use('/api', healthRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/farmer', farmerRoutes);
+app.use('/api/buyer/market', buyerMarketRoutes);
+app.use('/api/buyer/saved-lots', buyerSavedLotsRoutes);
+app.use('/api/buyer', buyerRoutes);
+app.use('/api/inquiries', inquiryRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/transport', transportRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/activity', activityRoutes);
+app.use('/api/lots', lotRoutes);
+app.use('/api/market', marketRoutes);
+app.get('/api/mandi-prices', require('./controllers/market.controller').getMandiPrices);
+app.use('/api/offers', offerRoutes);
+app.use('/api/storage', storageRoutes);
+app.use('/api/decision', decisionRoutes);
+app.use('/api/disputes', disputeRoutes);
+app.use('/api/quality', qualityRoutes);
+app.use('/api/audit', auditRoutes);
+if (process.env.NODE_ENV !== 'production' && process.env.ENABLE_TEST_ROUTES === 'true') {
+  app.use('/api/test', require('./routes/test.routes'));
+}
+
+
+
+const path = require('path');
+
+const rootDir = path.join(__dirname, '..');
+
+// Serve root static files (HTML, CSS, JS, Assets) with extension resolution
+app.use(express.static(rootDir, { extensions: ['html', 'htm'] }));
+
+// Support /KrishiShetra and /krishishetra path aliases so requests with folder prefix work seamlessly
+app.use(['/KrishiShetra', '/krishishetra'], express.static(rootDir, { extensions: ['html', 'htm'] }));
+
+// Explicit Admin Portal sign-in routes and aliases to prevent 404s
+const adminSignInRoutes = [
+  '/admin',
+  '/admin/',
+  '/admin/login',
+  '/admin/login.html',
+  '/admin-login',
+  '/admin-signin',
+  '/admin/signin',
+  '/KrishiShetra/admin',
+  '/KrishiShetra/admin/',
+  '/KrishiShetra/admin/login',
+  '/KrishiShetra/admin/login.html',
+  '/KrishiShetra/admin-login',
+  '/krishishetra/admin',
+  '/krishishetra/admin/',
+  '/krishishetra/admin/login',
+  '/krishishetra/admin/login.html',
+  '/krishishetra/admin-login'
+];
+
+app.get(adminSignInRoutes, (req, res) => {
+  res.sendFile(path.join(rootDir, 'admin', 'index.html'));
+});
+
+// Explicit Admin Dashboard clean routes
+const adminDashboardRoutes = [
+  '/admin/dashboard',
+  '/admin/dashboard.html',
+  '/KrishiShetra/admin/dashboard',
+  '/KrishiShetra/admin/dashboard.html',
+  '/krishishetra/admin/dashboard',
+  '/krishishetra/admin/dashboard.html'
+];
+
+app.get(adminDashboardRoutes, (req, res) => {
+  res.sendFile(path.join(rootDir, 'admin', 'dashboard.html'));
+});
+
+// Fallback for API health if accessed directly
+app.get('/api', (req, res) => {
+  res.json({
+    message: 'Welcome to KrishiShetra API'
+  });
+});
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server is running on port ${PORT} (bound to 0.0.0.0)`);
+
+  // Diagnostic environment checks
+  if (!process.env.MYSQL_PASSWORD || process.env.MYSQL_PASSWORD.trim() === '') {
+    console.warn('⚠️ MYSQL_PASSWORD is missing in environment. Database-backed features will be unavailable.');
+  }
+  if (!process.env.JWT_SECRET || process.env.JWT_SECRET.trim() === '') {
+    console.warn('⚠️ JWT_SECRET is missing in environment. Using default fallback secret for development.');
+  }
+
+  // Safe Email Service configuration check
+  if (!process.env.BREVO_API_KEY || process.env.BREVO_API_KEY.trim() === '' || process.env.BREVO_API_KEY === 'your_brevo_api_key') {
+    console.warn('⚠️ Email service configuration warning: BREVO_API_KEY is missing or unconfigured in .env');
+  } else if (!process.env.EMAIL_FROM || process.env.EMAIL_FROM.trim() === '' || process.env.EMAIL_FROM === 'your_verified_sender@example.com') {
+    console.warn('⚠️ Email service configuration warning: EMAIL_FROM is missing or unconfigured in .env');
+  } else {
+    console.log('✓ Brevo Transactional Email Service configured');
+  }
+});
+
+module.exports = app;

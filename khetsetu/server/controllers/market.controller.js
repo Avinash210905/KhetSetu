@@ -1,0 +1,395 @@
+const mysqlStore = require('../db/mysql-compat');
+const ProduceLot = require('../models/ProduceLot');
+
+const ALLOWED_SORTS = {
+  price_asc: { askingPrice: 1, _id: 1 },
+  price_desc: { askingPrice: -1, _id: 1 },
+  newest: { createdAt: -1, _id: -1 },
+  oldest: { createdAt: 1, _id: 1 }
+};
+
+const ALLOWED_QUALITY_GRADES = ['A', 'B', 'C'];
+const ALLOWED_QUANTITY_UNITS = ['kg', 'quintal', 'ton'];
+
+/**
+ * Format a lot document for public marketplace response
+ * Strips internal record IDs (farmer, createdBy, User) and formats safe fields
+ */
+const formatPublicLot = (lot) => {
+  const lotObj = lot.toObject ? lot.toObject() : lot;
+
+  return {
+    lotId: lotObj.lotId,
+    cropName: lotObj.cropName,
+    cropCategory: lotObj.cropCategory || 'cereals_grains',
+    variety: lotObj.variety,
+    quantity: lotObj.quantity,
+    quantityUnit: lotObj.quantityUnit,
+    qualityGrade: lotObj.qualityGrade,
+    qualityNotes: lotObj.qualityNotes || '',
+    qualityParameters: lotObj.qualityParameters || {},
+    assaying: lotObj.assaying || { isAssayed: false, verificationStatus: 'uninspected' },
+    aiQualityScan: lotObj.aiQualityScan || {},
+    qualityEvidence: lotObj.qualityEvidence || {},
+    storageType: lotObj.storageType,
+    storageLocation: lotObj.storageLocation || '',
+    askingPrice: lotObj.askingPrice,
+    priceUnit: lotObj.priceUnit,
+    harvestDate: lotObj.harvestDate,
+    description: lotObj.description || lotObj.qualityNotes || '',
+    state: lotObj.state || '',
+    district: lotObj.district || '',
+    taluka: lotObj.taluka || '',
+    village: lotObj.village || '',
+    pincode: lotObj.pincode || '',
+    photos: lotObj.photos || [],
+    status: lotObj.status,
+    farmerName: (lotObj.farmer && lotObj.farmer.farmName) ? lotObj.farmer.farmName : 'Verified Farmer',
+    createdAt: lotObj.createdAt
+  };
+};
+
+/**
+ * @desc    Discover active produce lots in the marketplace
+ * @route   GET /api/market/lots
+ * @access  Public
+ */
+const getMarketLots = async (req, res) => {
+  try {
+    const {
+      search,
+      cropName,
+      state,
+      district,
+      taluka,
+      minPrice,
+      maxPrice,
+      qualityGrade,
+      quantityUnit,
+      sort,
+      page,
+      limit
+    } = req.query;
+
+    // 1. Validation for Pagination & Limits
+    let pageNum = 1;
+    if (page !== undefined) {
+      pageNum = parseInt(page, 10);
+      if (isNaN(pageNum) || pageNum < 1) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid page parameter. Page must be a positive integer.'
+        });
+      }
+    }
+
+    let limitNum = 12;
+    if (limit !== undefined) {
+      limitNum = parseInt(limit, 10);
+      if (isNaN(limitNum) || limitNum < 1 || limitNum > 50) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid limit parameter. Limit must be an integer between 1 and 50.'
+        });
+      }
+    }
+
+    // 2. Validation for Sort
+    let sortKey = 'newest';
+    if (sort !== undefined) {
+      if (!ALLOWED_SORTS[sort]) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid sort parameter. Allowed values: ${Object.keys(ALLOWED_SORTS).join(', ')}.`
+        });
+      }
+      sortKey = sort;
+    }
+
+    // 3. Validation for Quality Grade
+    if (qualityGrade !== undefined && !ALLOWED_QUALITY_GRADES.includes(qualityGrade)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid qualityGrade parameter. Allowed values: ${ALLOWED_QUALITY_GRADES.join(', ')}.`
+      });
+    }
+
+    // 4. Validation for Quantity Unit
+    if (quantityUnit !== undefined && !ALLOWED_QUANTITY_UNITS.includes(quantityUnit)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid quantityUnit parameter. Allowed values: ${ALLOWED_QUANTITY_UNITS.join(', ')}.`
+      });
+    }
+
+    // 5. Validation for Price Range
+    let minPriceNum;
+    if (minPrice !== undefined && minPrice !== '') {
+      minPriceNum = parseFloat(minPrice);
+      if (isNaN(minPriceNum) || minPriceNum < 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid minPrice parameter. Price must be a non-negative number.'
+        });
+      }
+    }
+
+    let maxPriceNum;
+    if (maxPrice !== undefined && maxPrice !== '') {
+      maxPriceNum = parseFloat(maxPrice);
+      if (isNaN(maxPriceNum) || maxPriceNum < 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid maxPrice parameter. Price must be a non-negative number.'
+        });
+      }
+    }
+
+    if (minPriceNum !== undefined && maxPriceNum !== undefined && minPriceNum > maxPriceNum) {
+      return res.status(400).json({
+        success: false,
+        message: 'minPrice cannot be greater than maxPrice.'
+      });
+    }
+
+    // 6. Build the lot filter (active lots only)
+    const filter = {
+      status: 'active'
+    };
+
+    // Generic Search across cropName, variety, district, state
+    if (search && search.trim()) {
+      const searchRegex = new RegExp(search.trim(), 'i');
+      filter.$or = [
+        { cropName: searchRegex },
+        { variety: searchRegex },
+        { district: searchRegex },
+        { state: searchRegex }
+      ];
+    }
+
+    // Specific Filters
+    if (cropName && cropName.trim()) {
+      filter.cropName = new RegExp(`^${cropName.trim()}$`, 'i');
+    }
+
+    if (state && state.trim()) {
+      filter.state = new RegExp(state.trim(), 'i');
+    }
+
+    if (district && district.trim()) {
+      filter.district = new RegExp(district.trim(), 'i');
+    }
+
+    if (taluka && taluka.trim()) {
+      filter.taluka = new RegExp(taluka.trim(), 'i');
+    }
+
+    if (qualityGrade) {
+      filter.qualityGrade = qualityGrade;
+    }
+
+    if (quantityUnit) {
+      filter.quantityUnit = quantityUnit;
+    }
+
+    if (minPriceNum !== undefined || maxPriceNum !== undefined) {
+      filter.askingPrice = {};
+      if (minPriceNum !== undefined) filter.askingPrice.$gte = minPriceNum;
+      if (maxPriceNum !== undefined) filter.askingPrice.$lte = maxPriceNum;
+    }
+
+    // 7. Execute Pagination & Database Query
+    const skip = (pageNum - 1) * limitNum;
+    const total = await ProduceLot.countDocuments(filter);
+    const totalPages = Math.ceil(total / limitNum) || 1;
+
+    const rawLots = await ProduceLot.find(filter)
+      .populate({
+        path: 'farmer',
+        select: 'farmName'
+      })
+      .sort(ALLOWED_SORTS[sortKey])
+      .skip(skip)
+      .limit(limitNum);
+
+    const formattedLots = rawLots.map(formatPublicLot);
+
+    return res.status(200).json({
+      success: true,
+      count: formattedLots.length,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        pages: totalPages
+      },
+      lots: formattedLots
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Server error while retrieving marketplace lots'
+    });
+  }
+};
+
+/**
+ * @desc    Get single public active produce lot by Lot ID
+ * @route   GET /api/market/lots/:lotId
+ * @access  Public
+ */
+const getSinglePublicLot = async (req, res) => {
+  try {
+    const { lotId } = req.params;
+
+    const query = { status: 'active' };
+    if (mysqlStore.Types.ObjectId.isValid(lotId)) {
+      query.$or = [{ lotId }, { _id: lotId }];
+    } else {
+      query.lotId = lotId;
+    }
+
+    const lot = await ProduceLot.findOne(query).populate({
+      path: 'farmer',
+      select: 'farmName'
+    });
+
+    if (!lot) {
+      return res.status(404).json({
+        success: false,
+        message: 'Active produce lot not found'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      lot: formatPublicLot(lot)
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Server error while retrieving produce lot'
+    });
+  }
+};
+
+/**
+ * @desc    Get live Government of India mandi prices from data.gov.in
+ * @route   GET /api/market/mandi-prices
+ * @access  Public
+ */
+const getMandiPrices = async (req, res) => {
+  try {
+    const { getGovernmentMandiPrices } = require('../services/mandi.service');
+    const result = await getGovernmentMandiPrices(req.query);
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(200).json({
+      success: false,
+      source: 'data.gov.in',
+      sourceStatus: 'unavailable',
+      message: 'Current government data is temporarily unavailable.',
+      fetchedAt: null,
+      count: 0,
+      data: []
+    });
+  }
+};
+
+/**
+ * @desc    Get latest real mandi prices via CEDA Agmarknet.
+ *          CEDA allows only 40 requests/hour, so: one request per crop covering the last
+ *          7 days (latest reported day is kept), a 3-hour cache persisted to disk,
+ *          max 3 concurrent CEDA calls, and a 1-hour pause after a 429 rate-limit response.
+ * @route   GET /api/market/live-prices?commodity=Onion&state=Maharashtra
+ * @access  Public
+ */
+const fs = require('fs');
+const path = require('path');
+
+const CEDA_COMMODITY_NAMES = { soybean: 'Soyabean' };
+const LIVE_CACHE_FILE = path.join(__dirname, '..', 'data', 'ceda_live_cache.json');
+const LIVE_TTL_MS = 3 * 60 * 60 * 1000;
+const LOOKBACK_DAYS = 7;
+
+let liveCache = {};
+try { liveCache = JSON.parse(fs.readFileSync(LIVE_CACHE_FILE, 'utf8')) || {}; } catch (e) { liveCache = {}; }
+let cedaBlockedUntil = 0;
+const liveInflight = new Map();
+let cedaActive = 0;
+const cedaWaiters = [];
+
+async function withCedaSlot(fn) {
+  if (cedaActive >= 3) await new Promise(resolve => cedaWaiters.push(resolve));
+  cedaActive++;
+  try {
+    return await fn();
+  } finally {
+    cedaActive--;
+    const next = cedaWaiters.shift();
+    if (next) next();
+  }
+}
+
+async function fetchCedaLatest(commodity, state) {
+  const { marketPriceService, getIndiaTodayDate } = require('../services/marketPrice.service');
+  const today = getIndiaTodayDate();
+  const fromDate = new Date(Date.parse(today) - LOOKBACK_DAYS * 86400000).toISOString().slice(0, 10);
+  const result = await marketPriceService.cedaProvider.getMarketPrices({ commodity, state, date: today, fromDate });
+
+  const records = (result && Array.isArray(result.data)) ? result.data.filter(r => r.modalPrice > 0) : [];
+  const latestDate = records.reduce((max, r) => (r.reportDate > max ? r.reportDate : max), '');
+  const latest = records.filter(r => r.reportDate === latestDate);
+
+  return {
+    success: latest.length > 0,
+    provider: 'ceda',
+    source: 'CEDA Agmarknet API (Ashoka University)',
+    commodity,
+    date: latestDate || null,
+    count: latest.length,
+    data: latest
+  };
+}
+
+const getLivePrices = async (req, res) => {
+  const raw = String(req.query.commodity || req.query.crop || '').trim();
+  const commodity = CEDA_COMMODITY_NAMES[raw.toLowerCase()] || raw;
+  const state = req.query.state || 'Maharashtra';
+  const key = `${commodity.toLowerCase()}_${state.toLowerCase()}`;
+  const cached = liveCache[key];
+  const empty = { success: false, commodity, data: [], message: 'No recent price report available.' };
+
+  if (!commodity) return res.status(200).json(empty);
+  if (cached && Date.now() - cached.t < LIVE_TTL_MS) return res.status(200).json(cached.payload);
+  if (Date.now() < cedaBlockedUntil) return res.status(200).json(cached ? cached.payload : empty);
+
+  try {
+    if (!liveInflight.has(key)) {
+      liveInflight.set(key, withCedaSlot(() => fetchCedaLatest(commodity, state)).finally(() => liveInflight.delete(key)));
+    }
+    const payload = await liveInflight.get(key);
+
+    // Keep the last good prices if CEDA has nothing new for this crop
+    if (payload.success || !cached) {
+      liveCache[key] = { t: Date.now(), payload };
+      fs.writeFile(LIVE_CACHE_FILE, JSON.stringify(liveCache), () => {});
+    }
+    return res.status(200).json(payload.success ? payload : (cached ? cached.payload : payload));
+  } catch (error) {
+    if (error && error.statusCode === 429) {
+      cedaBlockedUntil = Date.now() + 60 * 60 * 1000;
+      console.warn('⚠️ CEDA rate limit reached (40/hour). Serving cached prices for 1 hour.');
+    }
+    return res.status(200).json(cached ? cached.payload : empty);
+  }
+};
+
+module.exports = {
+  getMarketLots,
+  getSinglePublicLot,
+  getMandiPrices,
+  getLivePrices
+};
+

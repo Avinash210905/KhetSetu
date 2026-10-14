@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Fleet & Vehicle Management | KhetSetu Transporter</title>
+  <meta name="description" content="Manage your commercial agri-fleet, VAHAN RC verifications, fitness certificates, FASTags, and live vehicle GPS telemetry.">
+  
+  <!-- Google Fonts: Outfit + Playfair Display + Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="css/transporter.css">
+</head>
+<body data-require-role="transporter">
+
+  <!-- =========================================================================
+       HEADER & NAVIGATION BAR
+       ========================================================================= -->
+  <header class="trans-header">
+    <div class="trans-header-inner">
+      <a href="dashboard.html" class="trans-brand">
+        <div class="brand-icon-box"><i data-lucide="sprout"></i></div>
+        <span class="trans-brand-text">
+          Krishi<span>Shetra</span>
+          <span class="trans-brand-badge">Transporter Hub</span>
+        </span>
+      </a>
+
+      <nav>
+        <ul class="trans-nav-menu" id="transNavMenu">
+          <li><a href="dashboard.html" class="trans-nav-link"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+          <li><a href="available-loads.html" class="trans-nav-link"><i data-lucide="package-search"></i> Available Loads</a></li>
+          <li><a href="active-trips.html" class="trans-nav-link"><i data-lucide="truck"></i> Active Trips</a></li>
+          <li><a href="fleet.html" class="trans-nav-link active"><i data-lucide="shield-check"></i> Fleet</a></li>
+          <li><a href="drivers.html" class="trans-nav-link"><i data-lucide="users"></i> Drivers</a></li>
+          <li><a href="earnings.html" class="trans-nav-link"><i data-lucide="wallet"></i> Earnings</a></li>
+          <li><a href="profile.html" class="trans-nav-link"><i data-lucide="user-check"></i> Profile</a></li>
+          <li class="trans-mobile-logout"><a href="javascript:void(0)" class="trans-nav-link trans-nav-link--danger" onclick="if(window.Auth&&typeof window.Auth.logout==='function'){window.Auth.logout();}else{localStorage.clear();window.location.href='../login.html';}"><i data-lucide="log-out"></i> Logout / Sign Out</a></li>
+        </ul>
+      </nav>
+
+      <div class="trans-header-actions">
+        <a href="../index.html" class="portal-switch-btn" title="Go to FPO Dashboard">
+          <i data-lucide="repeat" style="width:14px;height:14px;"></i> FPO Hub
+        </a>
+
+        <button class="trans-btn-icon" title="Notifications" onclick="showToast('All 14 fleet trucks passed quarterly fitness audit.')">
+          <i data-lucide="bell" style="width:18px;height:18px;"></i>
+          <span class="trans-notif-dot"></span>
+        </button>
+
+        <div class="trans-profile-wrap" id="transProfileWrap">
+          <button type="button" class="trans-user-pill" id="btnTransProfile" aria-expanded="false" aria-haspopup="true" aria-label="Transporter profile menu">
+            <div class="trans-user-avatar" id="transHeaderAvatar">KE</div>
+            <div class="trans-user-info">
+              <span class="trans-user-name" id="transHeaderName">Kisan Express</span>
+              <span class="trans-user-role">Gold Carrier ✓</span>
+            </div>
+            <i data-lucide="chevron-down" class="trans-user-chevron"></i>
+          </button>
+
+          <div class="trans-profile-dropdown" id="transProfileDropdown" role="menu">
+            <div class="trans-dropdown-header">
+              <div class="trans-user-avatar" style="width:38px;height:38px;font-size:14px;" id="transDropdownAvatar">KE</div>
+              <div style="overflow:hidden;">
+                <div class="trans-dropdown-name" id="transDropdownName">Kisan Express Logistics</div>
+                <div class="trans-dropdown-sub" id="transDropdownSub">Gold Carrier · VAHAN Verified</div>
+              </div>
+            </div>
+            <div class="trans-dropdown-sep"></div>
+            <a href="profile.html" class="trans-dropdown-item" role="menuitem"><i data-lucide="user-check"></i> Profile & Fleet Info</a>
+            <a href="onboarding.html" class="trans-dropdown-item" role="menuitem"><i data-lucide="shield-check"></i> Compliance & Permits</a>
+            <a href="earnings.html" class="trans-dropdown-item" role="menuitem"><i data-lucide="wallet"></i> FASTag & Earnings</a>
+            <div class="trans-dropdown-sep"></div>
+            <a href="javascript:void(0)" class="trans-dropdown-item trans-dropdown-item--danger" id="transLogoutBtn" role="menuitem"><i data-lucide="log-out"></i> Logout / Sign Out</a>
+          </div>
+        </div>
+
+        <button class="trans-hamburger" id="transHamburger" aria-label="Toggle navigation menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       MAIN CONTENT CONTAINER
+       ========================================================================= -->
+  <main class="trans-main">
+    <div class="trans-container">
+
+      <!-- Page Header -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:20px;">
+        <div>
+          <div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--transporter-primary);background:var(--transporter-surface-mint);padding:3px 9px;border-radius:var(--radius-full);margin-bottom:6px;">
+            <i data-lucide="shield-check" style="width:13px;height:13px;"></i> VAHAN 4.0 Verified Commercial Fleet
+          </div>
+          <h1 style="font-size:26px;font-weight:800;color:var(--transporter-text);font-family:var(--font-serif);line-height:1.2;">
+            My Fleet
+          </h1>
+          <p style="color:var(--transporter-muted);font-size:14px;margin-top:3px;">
+            Manage your vehicles and availability.
+          </p>
+        </div>
+        
+        <div style="display:flex;gap:10px;align-items:center;">
+          <button class="btn btn-secondary" onclick="showToast('Fleet compliance report exported as PDF!', 'success')"><i data-lucide="download"></i> Export PDF</button>
+          <button class="btn btn-primary" onclick="openAddVehicleModal()"><i data-lucide="plus-circle"></i> Register Vehicle</button>
+        </div>
+      </div>
+
+      <!-- Fleet Summary Metrics -->
+      <div class="stats-kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 20px;">
+        <div class="stat-kpi-card">
+          <div class="stat-kpi-top">
+            <span class="stat-kpi-lbl">Total Vehicles</span>
+            <div class="stat-kpi-icon green"><i data-lucide="truck"></i></div>
+          </div>
+          <div class="stat-kpi-val">14 Trucks</div>
+          <div class="stat-kpi-sub">Total Payload: 218 Metric Tons</div>
+        </div>
+
+        <div class="stat-kpi-card">
+          <div class="stat-kpi-top">
+            <span class="stat-kpi-lbl">Available</span>
+            <div class="stat-kpi-icon blue"><i data-lucide="check-circle"></i></div>
+          </div>
+          <div class="stat-kpi-val">8 Trucks</div>
+          <div class="stat-kpi-sub">Ready for Immediate Loading</div>
+        </div>
+
+        <div class="stat-kpi-card">
+          <div class="stat-kpi-top">
+            <span class="stat-kpi-lbl">On Trip</span>
+            <div class="stat-kpi-icon amber"><i data-lucide="navigation"></i></div>
+          </div>
+          <div class="stat-kpi-val">5 Trucks</div>
+          <div class="stat-kpi-sub">Live Highway AIS-140 GPS</div>
+        </div>
+
+        <div class="stat-kpi-card">
+          <div class="stat-kpi-top">
+            <span class="stat-kpi-lbl">Maintenance</span>
+            <div class="stat-kpi-icon purple"><i data-lucide="wrench"></i></div>
+          </div>
+          <div class="stat-kpi-val">1 Truck</div>
+          <div class="stat-kpi-sub">Scheduled Quarterly Fitness</div>
+        </div>
+      </div>
+
+      <!-- Filter and Search Toolbar -->
+      <div class="card-panel" style="padding:16px;margin-bottom:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="pill-chip active" onclick="filterFleet('ALL', this)">All Fleet (14)</button>
+            <button class="pill-chip" onclick="filterFleet('Available', this)">Available (8)</button>
+            <button class="pill-chip" onclick="filterFleet('On Trip', this)">On Trip (5)</button>
+            <button class="pill-chip" onclick="filterFleet('Maintenance', this)">Maintenance (1)</button>
+          </div>
+
+          <div style="position:relative;min-width:240px;">
+            <i data-lucide="search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--transporter-subtle);"></i>
+            <input type="text" id="fleetSearchInput" class="form-input" placeholder="Search vehicle no, type, driver..." style="padding-left:32px;font-size:13px;" oninput="searchFleetTable()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Fleet Table / Card Panel -->
+      <div class="card-panel" style="padding:0;overflow:hidden;">
+        <div class="data-table-wrap">
+          <table class="data-table" id="fleetTable">
+            <thead>
+              <tr>
+                <th>Vehicle No / Model</th>
+                <th>Type & Capacity</th>
+                <th>Assigned Driver</th>
+                <th>Status</th>
+                <th>VAHAN RC & Fitness</th>
+                <th>Insurance & Form 48</th>
+                <th>GPS Telemetry</th>
+                <th style="text-align:right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="fleetTableBody">
+              <!-- Rendered dynamically via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       FOOTER
+       ========================================================================= -->
+  <footer class="trans-footer">
+    <div class="trans-container trans-footer-inner">
+      <div>© 2026 KhetSetu Agri-Logistics Infrastructure Ltd. · VAHAN & Sarathi Integrated</div>
+      <div style="display:flex;gap:16px;">
+        <a href="onboarding.html">Compliance & Permits</a>
+        <a href="earnings.html">FASTag Escrow</a>
+        <a href="profile.html">Carrier Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/page-guard.js"></script>
+  <script src="js/transporter-data.js"></script>
+  <script src="js/transporter.js"></script>
+  <script>
+    let currentFleetFilter = 'ALL';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderFleetTable();
+    });
+
+    function filterFleet(status, btn) {
+      document.querySelectorAll('.pill-chip').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      currentFleetFilter = status;
+      renderFleetTable();
+    }
+
+    function searchFleetTable() {
+      renderFleetTable();
+    }
+
+    function renderFleetTable() {
+      const tbody = document.getElementById('fleetTableBody');
+      const search = (document.getElementById('fleetSearchInput')?.value || '').toLowerCase();
+      if (!tbody) return;
+
+      let list = TransporterData.fleet;
+      if (currentFleetFilter !== 'ALL') {
+        if (currentFleetFilter === 'On Trip') {
+          list = list.filter(f => f.status.toLowerCase().includes('trip') || f.status.toLowerCase().includes('transit') || f.status.toLowerCase().includes('loading'));
+        } else {
+          list = list.filter(f => f.status.toLowerCase().includes(currentFleetFilter.toLowerCase()));
+        }
+      }
+      if (search) {
+        list = list.filter(f => 
+          f.regNo.toLowerCase().includes(search) ||
+          f.type.toLowerCase().includes(search) ||
+          f.driver.toLowerCase().includes(search)
+        );
+      }
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:36px;color:var(--transporter-muted);">No vehicles match your search criteria.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(veh => {
+        let statusBadgeClass = 'available';
+        if (veh.status.includes('Trip') || veh.status.includes('Loading')) statusBadgeClass = 'in-transit';
+        if (veh.status.includes('Maintenance')) statusBadgeClass = 'delayed';
+
+        return `
+          <tr>
+            <td>
+              <div style="font-weight:800;font-size:13.5px;color:var(--transporter-text);font-family:monospace;letter-spacing:0.02em;">${veh.regNo}</div>
+              <div style="font-size:11.5px;color:var(--transporter-muted);">${veh.id} · GPS Tagged</div>
+            </td>
+            <td>
+              <div style="font-weight:700;font-size:13px;color:var(--transporter-text);">${veh.type}</div>
+              <div style="font-size:11.5px;color:var(--transporter-primary);font-weight:600;">Capacity: ${veh.capacity}</div>
+            </td>
+            <td>
+              <div style="font-size:13px;font-weight:700;color:var(--transporter-text);">${veh.driver}</div>
+              <div style="font-size:11.5px;color:var(--transporter-subtle);">${veh.driver !== 'Unassigned' ? 'Commercial HMV Active' : 'Standby'}</div>
+            </td>
+            <td>
+              <span class="status-badge ${statusBadgeClass}">
+                ● ${veh.status}
+              </span>
+            </td>
+            <td>
+              <div style="font-size:12px;font-weight:700;color:var(--transporter-success);"><i data-lucide="check-circle" style="width:12px;height:12px;display:inline;"></i> Valid RC</div>
+              <div style="font-size:11px;color:var(--transporter-muted);">Fitness: ${veh.fitnessExpiry}</div>
+            </td>
+            <td>
+              <div style="font-size:12px;color:var(--transporter-text);">${veh.insuranceExpiry}</div>
+              <div style="font-size:11px;color:var(--transporter-success);">Form 48 Active</div>
+            </td>
+            <td>
+              <span style="font-size:11.5px;font-weight:700;color:var(--transporter-success);background:var(--transporter-success-bg);padding:2px 7px;border-radius:var(--radius-xs);display:inline-flex;align-items:center;gap:4px;">
+                <span style="width:6px;height:6px;border-radius:50%;background:#10B981;"></span> ${veh.gpsSignal}
+              </span>
+            </td>
+            <td style="text-align:right;">
+              <button class="btn btn-secondary btn-sm" onclick="showToast('Vehicle ${veh.regNo} telemetry and trip history opened.')"><i data-lucide="eye"></i> View vehicle</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      if (window.lucide) lucide.createIcons();
+    }
+  </script>
+</body>
+</html>

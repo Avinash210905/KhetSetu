@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mandi Price Comparison & Profitability Intelligence — KhetSetu</title>
+  <meta name="description"
+    content="Enterprise B2B Mandi Price Comparison Dashboard. Compare prices, distance, freight rates, weather, and net realizations across 45+ Indian APMC mandis.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400;1,600&display=swap"
+    rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/mandi-compare.css">
+  <!-- Krishi Sahayak AI Market Assistant -->
+  <link rel="stylesheet" href="css/krishi-sahayak.css">
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <!-- i18n -->
+  <script src="js/translations.js"></script>
+  <script src="js/i18n.js"></script>
+</head>
+
+<body class="dashboard-body" data-require-role="farmer">
+
+  <!-- AMBIENT BACKGROUND -->
+  <div class="dash-ambient-bg" aria-hidden="true">
+    <div class="dash-ambient-bg__img"></div>
+    <div class="dash-ambient-bg__overlay"></div>
+    <div class="dash-ambient-bg__sunlight-glow"></div>
+    <div class="dash-ambient-bg__particles"></div>
+  </div>
+
+  <!-- FIXED TOP HEADER / NAVBAR -->
+  <header class="dash-header" id="dash-header">
+    <div class="dash-header__inner">
+      <!-- Brand Logo -->
+      <a href="index.html" class="dash-header__logo" id="dash-logo">
+        <span class="dash-header__logo-icon"><i data-lucide="sprout"></i></span>
+        <span class="dash-header__logo-text">KhetSetu</span>
+        <span class="dash-header__role-badge">FARMER</span>
+      </a>
+
+      <!-- Global Search -->
+      <div class="dash-search" id="dash-search">
+        <i data-lucide="search" class="dash-search__icon"></i>
+        <input type="text" id="dash-search-input" class="dash-search__input"
+          placeholder="Search mandis, crops, prices..." autocomplete="off" aria-label="Mandi search"
+          data-i18n-placeholder="common.searchPlaceholder">
+        <kbd class="dash-search__kbd">Ctrl K</kbd>
+      </div>
+
+      <!-- Navigation Links (populated by navbar.js) -->
+      <nav class="dash-header__nav" id="dash-nav"></nav>
+
+      <!-- Right Actions -->
+      <div class="dash-header__actions">
+        <button class="dash-header__action-btn" id="btn-notifications" aria-label="Notifications" title="Notifications">
+          <i data-lucide="bell"></i>
+        </button>
+        <div class="dash-profile-wrap" id="dash-profile-wrap">
+          <button class="dash-header__profile" id="btn-profile" aria-label="Profile menu">
+            <div class="dash-header__avatar" id="header-avatar">R</div>
+            <span class="dash-header__profile-name" id="header-user-name">Rajesh</span>
+            <i data-lucide="chevron-down" class="dash-header__profile-chevron"></i>
+          </button>
+          <div class="dash-profile-dropdown" id="dash-profile-dropdown">
+            <div class="dash-profile-dropdown__header">
+              <div class="dash-header__avatar dash-header__avatar--lg" id="dropdown-avatar">R</div>
+              <div>
+                <div class="dash-profile-dropdown__name" id="dropdown-user-name">Rajesh Patil</div>
+                <div class="dash-profile-dropdown__phone" id="dropdown-user-phone">+91 98765 43210</div>
+              </div>
+            </div>
+            <div class="dash-profile-dropdown__sep"></div>
+            <a href="dashboard.html" class="dash-profile-dropdown__item"><i data-lucide="layout-dashboard"></i>
+              Dashboard</a>
+            <a href="lots.html" class="dash-profile-dropdown__item"><i data-lucide="package"></i> My Lots</a>
+            <a href="disputes.html" class="dash-profile-dropdown__item"><i data-lucide="shield-alert"></i>
+              <span data-i18n="navigation.disputes">Trade Disputes</span></a>
+            <div class="dash-profile-dropdown__sep"></div>
+            <a href="index.html" class="dash-profile-dropdown__item dash-profile-dropdown__item--danger"><i
+                data-lucide="log-out"></i> Logout</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Toggle -->
+      <button class="dash-header__toggle" id="dash-nav-toggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MOBILE NAV -->
+  <div class="dash-mobile-nav" id="dash-mobile-nav">
+    <div class="dash-mobile-nav__links" id="mnav-links">
+      <!-- Populated by navbar.js -->
+    </div>
+  </div>
+
+  <!-- ═════════════════════════════════════════════════
+       A) PAGE HEADER BANNER
+       ═════════════════════════════════════════════════ -->
+  <div class="mpc-page-hero">
+    <div class="container">
+      <div class="mpc-page-hero__inner">
+        <div>
+          <div class="mpc-page-hero__breadcrumb">
+            <a href="dashboard.html"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+            <i data-lucide="chevron-right"></i>
+            <span>Mandi Price Comparison</span>
+          </div>
+          <div class="mpc-page-hero__title-row">
+            <h1 class="mpc-page-hero__title" data-i18n="mandiCompare.compareTitle">Mandi Price Comparison</h1>
+            <span class="mpc-live-badge"><span class="mpc-live-dot"></span> <span data-i18n="mandiCompare.liveIntelligence">Live Intelligence</span></span>
+          </div>
+          <p class="mpc-page-hero__sub">Compare prices, logistics costs, distance and market conditions to find the most
+            profitable mandi.</p>
+        </div>
+
+        <div class="mpc-page-hero__actions">
+          <div class="mpc-last-updated">
+            <i data-lucide="clock"></i>
+            <span id="mpc-last-updated-text">Live · Today, 08:30 AM IST</span>
+          </div>
+          <button class="mpc-refresh-btn" id="mpc-refresh-btn">
+            <i data-lucide="refresh-cw"></i> <span data-i18n="mandiCompare.refreshPrices">Refresh Prices</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════════════════════════════
+       MAIN DECISION SUPPORT DASHBOARD
+       ═════════════════════════════════════════════════ -->
+  <main class="mpc-main">
+    <div class="container">
+
+      <!-- Official Government Data Disclosure Banner -->
+      <div class="mpc-gov-banner" id="mpc-gov-banner" style="background:#E5F0E7; border:1px solid #8FCB9B; border-radius:10px; padding:12px 18px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:18px;">🏛️</span>
+          <div>
+            <strong style="color:#12372A; font-size:13.5px;" id="mpc-gov-status-title">Government of India Mandi Data (Agmarknet)</strong>
+            <span style="color:#486653; font-size:12px; display:block;" id="mpc-gov-status-desc">Live and latest daily market price records from official data.gov.in repository</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span class="ks-badge ks-badge-protected" id="mpc-gov-status-badge" style="font-size:11px;">✓ Gov Data Connected</span>
+          <a href="https://data.gov.in/resource/current-daily-price-various-commodities-various-markets-mandi" target="_blank" rel="noopener" style="font-size:12px; color:#5B9A72; font-weight:600; text-decoration:underline;">Source: data.gov.in ↗</a>
+        </div>
+      </div>
+
+      <!-- ── B) COMPARISON CONTROL & INPUT PANEL ── -->
+      <section class="mpc-control-panel" id="mpc-controls-section">
+        <!-- Quick-select from farmer listed crops -->
+        <div class="mpc-your-crops-bar">
+          <span class="mpc-your-crops-label"><i data-lucide="sprout"></i> <span data-i18n="mandiCompare.yourListedLots">Your Listed Lots:</span></span>
+          <div class="mpc-your-crops-list" id="mpc-your-crops">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Main Parameter Controls -->
+        <div class="mpc-controls-grid">
+          <!-- 1. Commodity Selector -->
+          <div class="mpc-control-group">
+            <label class="mpc-label" for="mpc-crop-select">
+              <i data-lucide="wheat"></i> Commodity
+            </label>
+            <select id="mpc-crop-select" class="mpc-select">
+              <option value="onion" selected>🧅 Onion</option>
+              <option value="soybean">🫘 Soybean</option>
+              <option value="wheat">🌾 Wheat</option>
+              <option value="rice">🌾 Rice</option>
+              <option value="tomato">🍅 Tomato</option>
+              <option value="cotton">☁️ Cotton</option>
+              <option value="chilli">🌶️ Chilli</option>
+              <option value="groundnut">🥜 Groundnut</option>
+              <option value="maize">🌽 Maize</option>
+              <option value="potato">🥔 Potato</option>
+              <option value="sugarcane">🎋 Sugarcane</option>
+              <option value="mango">🥭 Mango</option>
+              <option value="banana">🍌 Banana</option>
+              <option value="grapes">🍇 Grapes</option>
+              <option value="pulses">🥣 Pulses</option>
+            </select>
+          </div>
+
+          <!-- 2. Quantity Input & Presets -->
+          <div class="mpc-control-group">
+            <label class="mpc-label" for="mpc-qty-input">
+              <i data-lucide="scale"></i> Batch Quantity
+            </label>
+            <div class="mpc-qty-row">
+              <div class="mpc-qty-input-wrap">
+                <input type="number" id="mpc-qty-input" class="mpc-input" value="25" min="1" max="10000"
+                  placeholder="Qty">
+                <span class="mpc-qty-unit-label">Quintals</span>
+              </div>
+              <div class="mpc-qty-presets">
+                <button type="button" class="mpc-qty-preset-btn" data-qty="10">10q</button>
+                <button type="button" class="mpc-qty-preset-btn active" data-qty="25">25q</button>
+                <button type="button" class="mpc-qty-preset-btn" data-qty="50">50q</button>
+                <button type="button" class="mpc-qty-preset-btn" data-qty="100">100q</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Farmer Origin / Dispatch Location -->
+          <div class="mpc-control-group">
+            <label class="mpc-label" for="mpc-origin-select">
+              <i data-lucide="map-pin"></i> Origin Hub
+            </label>
+            <select id="mpc-origin-select" class="mpc-select">
+              <option value="pune" selected>Pune (Maharashtra)</option>
+              <option value="nashik">Nashik (Maharashtra)</option>
+              <option value="nagpur">Nagpur (Maharashtra)</option>
+              <option value="indore">Indore (Madhya Pradesh)</option>
+              <option value="ahmedabad">Ahmedabad (Gujarat)</option>
+              <option value="jaipur">Jaipur (Rajasthan)</option>
+              <option value="bengaluru">Bengaluru (Karnataka)</option>
+              <option value="hyderabad">Hyderabad (Telangana)</option>
+              <option value="lucknow">Lucknow (Uttar Pradesh)</option>
+              <option value="delhi">Delhi NCR / Karnal</option>
+            </select>
+          </div>
+
+          <!-- 4. Quality Grade Selector -->
+          <div class="mpc-control-group">
+            <label class="mpc-label" for="mpc-grade-select">
+              <i data-lucide="sparkles"></i> Quality Grade
+            </label>
+            <select id="mpc-grade-select" class="mpc-select">
+              <option value="A">Grade A — Premium (+5%)</option>
+              <option value="B" selected>Grade B — FAQ Standard</option>
+              <option value="C">Grade C — Commercial (-8%)</option>
+            </select>
+          </div>
+
+          <!-- 5. Sort By Ranking -->
+          <div class="mpc-control-group">
+            <label class="mpc-label" for="mpc-sort-select">
+              <i data-lucide="arrow-up-down"></i> Primary Ranking
+            </label>
+            <select id="mpc-sort-select" class="mpc-select">
+              <option value="net" selected>⭐ Highest Net Realization</option>
+              <option value="price">💰 Highest Crop Price</option>
+              <option value="transport">🚚 Lowest Freight Rate</option>
+              <option value="dist">📍 Closest Proximity</option>
+              <option value="demand">🔥 Strongest Buyer Demand</option>
+              <option value="best">🏆 Balanced Score (Net+Dist+Demand)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Secondary Filter Strip -->
+        <div class="mpc-filters-bar">
+          <div class="mpc-filters-left">
+            <!-- Region Filter -->
+            <div class="mpc-filter-item">
+              <label for="mpc-state-filter"><i data-lucide="globe"></i> State:</label>
+              <select id="mpc-state-filter" class="mpc-select">
+                <option value="all" selected>All States</option>
+                <option value="Maharashtra">Maharashtra</option>
+                <option value="Gujarat">Gujarat</option>
+                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                <option value="Punjab">Punjab</option>
+                <option value="Haryana">Haryana</option>
+                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                <option value="Rajasthan">Rajasthan</option>
+                <option value="Karnataka">Karnataka</option>
+                <option value="Telangana">Telangana</option>
+                <option value="Tamil Nadu">Tamil Nadu</option>
+              </select>
+            </div>
+
+            <!-- Distance Filter -->
+            <div class="mpc-filter-item">
+              <label for="mpc-dist-filter"><i data-lucide="navigation-2"></i> Radius:</label>
+              <select id="mpc-dist-filter" class="mpc-select">
+                <option value="all" selected>All Distances</option>
+                <option value="100">Within 100 km</option>
+                <option value="300">Within 300 km</option>
+                <option value="500">Within 500 km</option>
+              </select>
+            </div>
+
+            <!-- Demand Filter -->
+            <div class="mpc-filter-item">
+              <label for="mpc-demand-filter"><i data-lucide="flame"></i> Demand:</label>
+              <select id="mpc-demand-filter" class="mpc-select">
+                <option value="all" selected>All Demand Levels</option>
+                <option value="high">High Demand Only</option>
+                <option value="medium">Medium & High</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Search Filter -->
+          <div class="mpc-search-wrap">
+            <i data-lucide="search"></i>
+            <input type="text" id="mpc-search-input" class="mpc-input" placeholder="Search mandi, city...">
+          </div>
+        </div>
+
+        <!-- Multi-Mandi Chip Bar -->
+        <div class="mpc-chip-bar">
+          <div class="mpc-chip-bar__left">
+            <span class="mpc-chip-title"><i data-lucide="layers"></i> Selected Mandis:</span>
+            <div class="mpc-chips-container" id="mpc-selected-chips">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+          <div class="mpc-chip-actions">
+            <button class="mpc-chip-quick-btn" id="mpc-chip-top5">Select Top 5</button>
+            <button class="mpc-chip-quick-btn" id="mpc-chip-nearby">Nearby (&lt;250km)</button>
+            <button class="mpc-chip-quick-btn" id="mpc-chip-clear" style="color:var(--mpc-muted);">Clear</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── C) QUICK DECISION SUMMARY (4 KPI CARDS) ── -->
+      <section class="mpc-section" id="mpc-kpi-section">
+        <div class="mpc-kpi-grid">
+          <!-- Card 1: Best Net Realization -->
+          <div class="mpc-kpi-card mpc-kpi-card--green">
+            <div class="mpc-kpi-header">
+              <span class="mpc-kpi-label" data-i18n="mandiCompare.bestNetRealization">Best Net Realization</span>
+              <div class="mpc-kpi-icon"><i data-lucide="trending-up"></i></div>
+            </div>
+            <div class="mpc-kpi-val" id="kpi-best-net-val">—</div>
+            <div class="mpc-kpi-name" id="kpi-best-net-name">—</div>
+            <div class="mpc-kpi-sub" id="kpi-best-net-sub">Net revenue after freight</div>
+          </div>
+
+          <!-- Card 2: Lowest Transport Cost -->
+          <div class="mpc-kpi-card mpc-kpi-card--gold">
+            <div class="mpc-kpi-header">
+              <span class="mpc-kpi-label" data-i18n="mandiCompare.lowestTransportCost">Lowest Transport Cost</span>
+              <div class="mpc-kpi-icon"><i data-lucide="truck"></i></div>
+            </div>
+            <div class="mpc-kpi-val" id="kpi-lowest-tr-val">—</div>
+            <div class="mpc-kpi-name" id="kpi-lowest-tr-name">—</div>
+            <div class="mpc-kpi-sub" id="kpi-lowest-tr-sub">Shortest transit haul</div>
+          </div>
+
+          <!-- Card 3: Closest Mandi -->
+          <div class="mpc-kpi-card mpc-kpi-card--blue">
+            <div class="mpc-kpi-header">
+              <span class="mpc-kpi-label" data-i18n="mandiCompare.closestMandi">Closest Mandi</span>
+              <div class="mpc-kpi-icon"><i data-lucide="map-pin"></i></div>
+            </div>
+            <div class="mpc-kpi-val" id="kpi-closest-val">—</div>
+            <div class="mpc-kpi-name" id="kpi-closest-name">—</div>
+            <div class="mpc-kpi-sub" id="kpi-closest-sub">Direct road transit</div>
+          </div>
+
+          <!-- Card 4: Best Overall Option -->
+          <div class="mpc-kpi-card mpc-kpi-card--purple">
+            <div class="mpc-kpi-header">
+              <span class="mpc-kpi-label" data-i18n="mandiCompare.bestOverallOption">Best Overall Option</span>
+              <div class="mpc-kpi-icon"><i data-lucide="award"></i></div>
+            </div>
+            <div class="mpc-kpi-val" id="kpi-best-overall-val" style="font-size:18px;">—</div>
+            <div class="mpc-kpi-name" id="kpi-best-overall-name">Composite Decision Rank</div>
+            <div class="mpc-kpi-sub" id="kpi-best-overall-sub">Price + Proximity + Demand</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── J) BEST MANDI RECOMMENDATION HERO PANEL ── -->
+      <section class="mpc-section" id="mpc-recommendation">
+        <!-- Rendered by JS -->
+      </section>
+
+      <!-- ── E) NET REALIZATION FORMULA & BENEFIT BREAKDOWN ── -->
+      <section class="mpc-section" id="mpc-formula-breakdown">
+        <!-- Rendered by JS -->
+      </section>
+
+      <!-- ── D) MAIN MULTI-MANDI COMPARISON TABLE ── -->
+      <section class="mpc-section" id="mpc-table-section">
+        <div class="mpc-section-header">
+          <div>
+            <h2 class="mpc-section-title"><i data-lucide="table"></i> <span data-i18n="mandiCompare.multiMandiMatrix">Multi-Mandi Decision Matrix</span></h2>
+            <p class="mpc-section-subtitle">Real-time comparison across prices, logistics deductions, net realization,
+              and weather</p>
+          </div>
+          <span class="mpc-badge mpc-badge--neutral" id="mpc-table-count">Loading...</span>
+        </div>
+
+        <div class="mpc-table-card">
+          <div class="mpc-table-wrap">
+            <table class="mpc-table" id="mpc-comparison-table">
+              <thead>
+                <tr>
+                  <th style="min-width:180px;">Mandi & Location</th>
+                  <th>Current Price</th>
+                  <th>Distance</th>
+                  <th>Est. Freight</th>
+                  <th>Gross Value</th>
+                  <th>Total Logistics</th>
+                  <th>Net Realization</th>
+                  <th>Arrivals</th>
+                  <th>Demand</th>
+                  <th>Weather</th>
+                  <th>Gov Freshness</th>
+                  <th>Recommendation</th>
+                </tr>
+              </thead>
+              <tbody id="mpc-comparison-tbody">
+                <!-- Rendered dynamically by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── F & G) DUAL VISUALIZATION HUB (BAR & SCATTER MATRIX) ── -->
+      <section class="mpc-section" id="mpc-visual-section">
+        <div class="mpc-chart-card">
+          <div class="mpc-chart-header">
+            <div>
+              <h2 class="mpc-section-title"><i data-lucide="bar-chart-3"></i> <span data-i18n="mandiCompare.visualAnalysisTitle">Visual Profitability Analysis</span></h2>
+              <p class="mpc-section-subtitle">Evaluate net returns and distance trade-offs visually</p>
+            </div>
+            <div class="mpc-chart-tabs">
+              <button class="mpc-chart-tab-btn active" data-chart="net">
+                <i data-lucide="trending-up"></i> Net Realization
+              </button>
+              <button class="mpc-chart-tab-btn" data-chart="price">
+                <i data-lucide="coins"></i> Mandi Price
+              </button>
+              <button class="mpc-chart-tab-btn" data-chart="transport">
+                <i data-lucide="truck"></i> Freight Cost
+              </button>
+              <button class="mpc-chart-tab-btn" data-chart="scatter">
+                <i data-lucide="crosshair"></i> Distance vs Profit Matrix
+              </button>
+            </div>
+          </div>
+          <div class="mpc-chart-wrapper">
+            <canvas id="mpc-chart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── H) WEATHER & MARKET CONDITIONS ── -->
+      <section class="mpc-section" id="mpc-weather-section">
+        <div class="mpc-section-header">
+          <div>
+            <h2 class="mpc-section-title"><i data-lucide="cloud-sun"></i> <span data-i18n="mandiCompare.marketConditionsWeather">Market Conditions & Weather</span></h2>
+            <p class="mpc-section-subtitle">Live weather forecast, arrival pressures, and buyer liquidity in key mandis
+            </p>
+          </div>
+        </div>
+        <div class="mpc-weather-grid" id="mpc-weather-strip">
+          <!-- Rendered by JS -->
+        </div>
+      </section>
+
+      <!-- ── I) MANDI DETAIL CARDS GRID ── -->
+      <section class="mpc-section" id="mpc-cards-section">
+        <div class="mpc-section-header">
+          <div>
+            <h2 class="mpc-section-title"><i data-lucide="grid"></i> <span data-i18n="mandiCompare.individualProfiles">Individual Mandi Profiles</span></h2>
+            <p class="mpc-section-subtitle">Click "+ Compare" to pin mandis into the decision matrix</p>
+          </div>
+          <span class="mpc-badge mpc-badge--neutral" id="mpc-cards-count">Loading mandis...</span>
+        </div>
+        <div class="mpc-cards-grid" id="mpc-cards-grid">
+          <!-- Rendered by JS -->
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer dash-footer">
+    <div class="container">
+      <div class="footer__inner">
+        <div>
+          <div class="footer__brand"><i data-lucide="sprout"
+              style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:4px;"></i>
+            KhetSetu</div>
+          <div class="footer__tagline">Know the Price. Choose the Market. Sell Better.</div>
+        </div>
+        <div class="footer__links">
+          <a href="dashboard.html" class="footer__link">Dashboard</a>
+          <a href="buyers.html" class="footer__link">For Buyers</a>
+          <a href="index.html" class="footer__link">About KhetSetu</a>
+        </div>
+      </div>
+      <div class="footer__copyright">© 2026 KhetSetu AgriTech Platform. Built for Indian Farmers & FPOs.</div>
+    </div>
+  </footer>
+
+  <!-- Multilingual Support (Farmer) -->
+  <script src="js/translations.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/auth.js"></script>
+  <!-- Dev: auto-create a farmer session on localhost -->
+  <script>
+    (function () {
+      var h = window.location.hostname;
+      var isLocal = h === 'localhost' || h === '127.0.0.1' || h === '';
+      if (isLocal && window.Auth && !window.Auth.isLoggedIn()) {
+        window.Auth.setDevSession('farmer');
+      }
+    })();
+  </script>
+  <script src="js/api.js"></script>
+  <script src="js/page-guard.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/mandi-compare.js"></script>
+  <!-- Krishi Sahayak AI Market Assistant -->
+  <script src="js/krishi-sahayak.js"></script>
+</body>
+
+</html>

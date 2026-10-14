@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Forecast — KhetSetu</title>
+  <meta name="description"
+    content="AI-powered mandi price forecasts, crop demand projections, confidence indicators, and smart selling window recommendations.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400;1,600&display=swap"
+    rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <!-- Krishi Sahayak AI Market Assistant -->
+  <link rel="stylesheet" href="css/krishi-sahayak.css">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+
+<body class="dashboard-body" data-protected>
+
+  <!-- AMBIENT FARMER SUNLIGHT BACKGROUND -->
+  <div class="dash-ambient-bg" aria-hidden="true">
+    <div class="dash-ambient-bg__img"></div>
+    <div class="dash-ambient-bg__overlay"></div>
+    <div class="dash-ambient-bg__sunlight-glow"></div>
+  </div>
+
+  <!-- HEADER / NAVBAR -->
+  <header class="dash-header" id="dash-header">
+    <div class="dash-header__inner">
+      <a href="index.html" class="dash-header__logo" id="dash-logo">
+        <span class="dash-header__logo-icon"><i data-lucide="sprout"></i></span>
+        <span class="dash-header__logo-text">KhetSetu</span>
+        <span class="dash-header__role-badge">FARMER</span>
+      </a>
+
+      <div class="dash-search" id="dash-search">
+        <i data-lucide="search" class="dash-search__icon"></i>
+        <input type="text" id="dash-search-input" class="dash-search__input"
+          placeholder="Search crops, markets, buyers..." autocomplete="off" aria-label="Global search">
+        <kbd class="dash-search__kbd">Ctrl K</kbd>
+        <div class="dash-search__results" id="dash-search-results"></div>
+      </div>
+
+      <nav class="dash-header__nav" id="dash-nav">
+        <a href="dashboard.html" class="dash-header__link" id="nav-dashboard">
+          <i data-lucide="layout-dashboard" class="dash-header__link-icon"></i> <span
+            data-i18n="navigation.dashboard">Dashboard</span>
+        </a>
+        <a href="lots.html" class="dash-header__link" id="nav-lots">
+          <i data-lucide="package" class="dash-header__link-icon"></i> <span data-i18n="navigation.myLots">My
+            Lots</span>
+        </a>
+        <a href="buyers.html" class="dash-header__link" id="nav-inquiries">
+          <i data-lucide="message-square" class="dash-header__link-icon"></i> <span
+            data-i18n="navigation.buyerInquiries">Buyer Inquiries</span>
+        </a>
+        <a href="storage.html" class="dash-header__link" id="nav-storage">
+          <i data-lucide="warehouse" class="dash-header__link-icon"></i> <span data-i18n="navigation.storage">Storage
+            Options</span>
+        </a>
+        <a href="market.html" class="dash-header__link" id="nav-market">
+          <i data-lucide="store" class="dash-header__link-icon"></i> <span data-i18n="navigation.market">Market
+            Prices</span>
+        </a>
+        <a href="ai-forecast.html" class="dash-header__link dash-header__link--active" id="nav-forecast">
+          <i data-lucide="brain" class="dash-header__link-icon"></i> <span data-i18n="navigation.aiForecast">AI Price
+            Forecast</span>
+        </a>
+        <a href="orders.html" class="dash-header__link" id="nav-orders">
+          <i data-lucide="clipboard-list" class="dash-header__link-icon"></i> <span
+            data-i18n="navigation.orders">Orders</span>
+        </a>
+      </nav>
+
+      <div class="dash-header__actions">
+        <button class="dash-header__action-btn" id="btn-notifications" aria-label="Notifications" title="Notifications">
+          <i data-lucide="bell"></i>
+          <span class="dash-header__badge" id="notifications-badge">3</span>
+        </button>
+        <div class="dash-profile-wrap" id="dash-profile-wrap">
+          <button class="dash-header__profile" id="btn-profile" aria-label="Profile menu">
+            <div class="dash-header__avatar" id="header-avatar">R</div>
+            <span class="dash-header__profile-name" id="header-user-name">Rajesh</span>
+            <i data-lucide="chevron-down" class="dash-header__profile-chevron"></i>
+          </button>
+          <div class="dash-profile-dropdown" id="dash-profile-dropdown">
+            <div class="dash-profile-dropdown__header">
+              <div class="dash-header__avatar dash-header__avatar--lg" id="dropdown-avatar">R</div>
+              <div>
+                <div class="dash-profile-dropdown__name" id="dropdown-user-name">Rajesh Patil</div>
+                <div class="dash-profile-dropdown__phone" id="dropdown-user-phone">+91 98765 43210</div>
+              </div>
+            </div>
+            <div class="dash-profile-dropdown__sep"></div>
+            <a href="#" class="dash-profile-dropdown__item" id="menu-profile"><i data-lucide="user"></i> My Profile &
+              Farm</a>
+            <a href="lots.html" class="dash-profile-dropdown__item" id="menu-lots"><i data-lucide="package"></i> Manage
+              My Lots</a>
+            <a href="#" class="dash-profile-dropdown__item" id="menu-alerts"><i data-lucide="bell-ring"></i> Price
+              Alerts</a>
+            <a href="#" class="dash-profile-dropdown__item" id="menu-help"><i data-lucide="phone-call"></i> Kisan
+              Helpline</a>
+            <div class="dash-profile-dropdown__sep"></div>
+            <a href="index.html" class="dash-profile-dropdown__item dash-profile-dropdown__item--danger"><i
+                data-lucide="log-out"></i> Logout</a>
+          </div>
+        </div>
+      </div>
+
+      <button class="dash-header__toggle" id="dash-nav-toggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Slide Nav -->
+  <div class="dash-mobile-nav" id="dash-mobile-nav">
+    <div class="dash-mobile-nav__links">
+      <a href="dashboard.html" class="dash-mobile-nav__link" id="mnav-dashboard"><i data-lucide="layout-dashboard"></i>
+        <span data-i18n="navigation.dashboard">Dashboard</span></a>
+      <a href="lots.html" class="dash-mobile-nav__link" id="mnav-lots"><i data-lucide="package"></i> <span
+          data-i18n="navigation.myLots">My Lots</span></a>
+      <a href="buyer-inquiries.html" class="dash-mobile-nav__link" id="mnav-inquiries"><i
+          data-lucide="message-square"></i> <span data-i18n="navigation.buyerInquiries">Buyer Inquiries</span></a>
+      <a href="storage.html" class="dash-mobile-nav__link" id="mnav-storage"><i data-lucide="warehouse"></i> <span
+          data-i18n="navigation.storage">Storage Options</span></a>
+      <a href="market.html" class="dash-mobile-nav__link" id="mnav-market"><i data-lucide="bar-chart-3"></i> <span
+          data-i18n="navigation.market">Market</span></a>
+      <a href="ai-forecast.html" class="dash-mobile-nav__link dash-mobile-nav__link--active" id="mnav-forecast"><i
+          data-lucide="brain"></i> <span data-i18n="navigation.aiForecast">AI Forecast</span></a>
+      <a href="orders.html" class="dash-mobile-nav__link" id="mnav-orders"><i data-lucide="clipboard-list"></i>
+        <span data-i18n="navigation.orders">Orders</span></a>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="dash-main" id="dash-main">
+
+    <!-- ── 1. AI MARKET FORECAST ENGINE ── -->
+    <section class="dash-section" id="dash-ai-forecast-section" style="padding-top: 24px;">
+      <div class="container">
+        <!-- Breadcrumb -->
+        <nav class="dash-breadcrumb" style="font-size: 13px; color: var(--ks-text-muted, #777); margin-bottom: 14px;">
+          <a href="dashboard.html" style="color: var(--ks-gold, #C9973B); text-decoration: none;"
+            data-i18n="navigation.dashboard">Dashboard</a> /
+          <strong data-i18n="navigation.aiForecast">AI Price Forecast</strong>
+        </nav>
+
+        <div class="dash-section__header">
+          <div>
+            <h1 class="dash-section__title" style="font-size: 28px;">🤖 <span data-i18n="ai.forecastEngineTitle">AI
+                Market Price Forecast Engine</span></h1>
+            <p class="dash-section__subtitle" data-i18n="ai.forecastEngineSubtitle">Predict price trends across 42
+              mandis using historical seasonality,
+              weather radar, and buyer demand trends.</p>
+          </div>
+        </div>
+
+        <!-- Interactive Forecast Control Bar -->
+        <div class="dash-card dash-forecast-controls-card">
+          <div class="dash-forecast-form">
+            <div class="dash-forecast-field">
+              <label for="forecast-crop-select" data-i18n="ai.selectCrop">Select Crop</label>
+              <select id="forecast-crop-select" class="dash-filter-select">
+                <option value="rice">Rice</option>
+                <option value="wheat">Wheat</option>
+                <option value="onion">Onion</option>
+                <option value="tomato">Tomato</option>
+                <option value="maize">Maize</option>
+                <option value="soybean">Soybean</option>
+                <option value="potato">Potato</option>
+                <option value="chilli">Chilli</option>
+                <option value="pulses">Pulses</option>
+                <option value="groundnut">Groundnut</option>
+                <option value="cotton">Cotton</option>
+              </select>
+            </div>
+            <div class="dash-forecast-field">
+              <label for="forecast-market-select" data-i18n="ai.selectMandi">Select Market Mandi</label>
+              <select id="forecast-market-select" class="dash-filter-select">
+                <option value="Pune APMC">Pune APMC (Maharashtra)</option>
+                <option value="Mumbai APMC">Mumbai APMC (Maharashtra)</option>
+                <option value="Nashik APMC">Nashik APMC (Maharashtra)</option>
+                <option value="Nagpur APMC">Nagpur APMC (Maharashtra)</option>
+                <option value="Solapur APMC">Solapur APMC (Maharashtra)</option>
+                <option value="Indore Mandi">Indore Mandi (Madhya Pradesh)</option>
+                <option value="Guntur APMC">Guntur APMC (Andhra Pradesh)</option>
+                <option value="Rajkot APMC">Rajkot APMC (Gujarat)</option>
+              </select>
+            </div>
+            <div class="dash-forecast-field">
+              <label data-i18n="ai.forecastHorizon">Forecast Horizon</label>
+              <div class="dash-forecast-tabs">
+                <button type="button" class="dash-forecast-tab dash-forecast-tab--active" data-days="7"><span
+                    data-i18n="ai.sevenDays">7 Days</span></button>
+                <button type="button" class="dash-forecast-tab" data-days="14"><span data-i18n="ai.fourteenDays">14
+                    Days</span></button>
+                <button type="button" class="dash-forecast-tab" data-days="30"><span data-i18n="ai.thirtyDays">30
+                    Days</span></button>
+              </div>
+            </div>
+            <div class="dash-forecast-btn-wrap">
+              <button class="btn btn--primary dash-forecast-btn" id="btn-generate-forecast"
+                style="min-height: 48px; font-weight: 700;">
+                <i data-lucide="sparkles"></i> <span data-i18n="ai.generateForecast">Generate Forecast</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Forecast Results Card -->
+        <div class="dash-ai-card" id="ai-insight-card" style="margin-top: 24px;">
+          <div class="dash-ai-card__glow"></div>
+          <div class="dash-ai-card__inner">
+            <div
+              style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+              <div class="dash-ai-card__badge" id="forecast-badge">
+                <i data-lucide="brain"></i> <span id="forecast-badge-text" data-i18n="farmer.aiSellingRecommendation">AI
+                  Recommendation · Live</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span
+                  style="background: #E8F5E9; color: #2E7D32; font-weight: 800; font-size: 13px; padding: 6px 12px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px;">
+                  <span>📈</span> <span id="forecast-trend-label" data-i18n="ai.priceRising">Price Rising</span>
+                </span>
+                <button class="kisan-voice-btn" id="btn-speak-forecast" onclick="speakForecastRecommendation()"
+                  style="min-height: 42px; padding: 6px 14px; font-size: 12.5px; color:white;"
+                  title="Listen to recommendation">
+                  <span id="forecast-voice-icon">🔊</span> <span id="forecast-voice-text"
+                    data-i18n="common.listen">Listen</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="dash-ai-card__content" id="forecast-result-content">
+              <div class="dash-ai-card__left">
+                <h3 class="dash-ai-card__headline" id="forecast-headline">Rice — Pune APMC Forecast</h3>
+                <p class="dash-ai-card__insight" id="forecast-insight-text">
+                  "Rice prices are projected to <em>rise by +4.2%</em> over the next 7 days due to reduced arrivals and
+                  strong procurement demand."
+                </p>
+                <div class="dash-ai-card__recommendation">
+                  <div class="dash-ai-card__rec-badge" id="forecast-rec-badge"
+                    style="font-size: 15px; font-weight: 800; padding: 8px 16px;" data-i18n="ai.waitDays">⏳ WAIT 3 DAYS
+                  </div>
+                  <div class="dash-ai-card__rec-details">
+                    <div class="dash-ai-card__rec-detail">
+                      <span class="dash-ai-card__rec-label" data-i18n="ai.currentPrice">Current Price</span>
+                      <span class="dash-ai-card__rec-value" id="forecast-current-price">Loading...</span>
+                    </div>
+                    <div class="dash-ai-card__rec-detail">
+                      <span class="dash-ai-card__rec-label" data-i18n="ai.expectedPrice">Expected Price</span>
+                      <span class="dash-ai-card__rec-value" id="forecast-expected-price">Loading...</span>
+                    </div>
+                    <div class="dash-ai-card__rec-detail">
+                      <span class="dash-ai-card__rec-label" data-i18n="ai.projectedChange">Projected Change</span>
+                      <span class="dash-ai-card__rec-value dash-ai-card__rec-value--highlight"
+                        id="forecast-change-val">+4.2% (↑ ₹120/q)</span>
+                    </div>
+                    <div class="dash-ai-card__rec-detail">
+                      <span class="dash-ai-card__rec-label" data-i18n="ai.confidence">Confidence</span>
+                      <span class="dash-ai-card__rec-value dash-ai-card__rec-value--highlight"
+                        id="forecast-confidence-val">87%</span>
+                    </div>
+                  </div>
+                  <p class="dash-ai-card__reason" id="forecast-reason-text">
+                    <i data-lucide="info"></i> "Buyer demand is rising by 14% while regional mandi arrivals dropped 8%
+                    this week."
+                  </p>
+                </div>
+                <div class="dash-ai-card__btns">
+                  <a href="lots.html" class="btn btn--primary" id="btn-forecast-sell-action"
+                    style="min-height: 48px; font-weight: 700;"><i data-lucide="plus-circle"></i> <span
+                      data-i18n="ai.createLotTarget">Create Lot at Target Price</span></a>
+                  <button class="btn btn--secondary" id="btn-set-alert-ai" onclick="openAlertModal()"
+                    style="min-height: 48px; font-weight: 700;"><i data-lucide="bell-ring"></i> <span
+                      data-i18n="ai.setTargetAlert">Set Target Alert</span></button>
+                </div>
+              </div>
+
+              <div class="dash-ai-card__right">
+                <div class="dash-ai-card__ring">
+                  <svg viewBox="0 0 120 120">
+                    <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="8" />
+                    <circle cx="60" cy="60" r="52" fill="none" stroke="var(--ks-mint)" stroke-width="8"
+                      stroke-dasharray="326.73" stroke-dashoffset="42.47" stroke-linecap="round"
+                      transform="rotate(-90 60 60)" class="dash-ai-card__ring-progress" id="forecast-ring-circle" />
+                  </svg>
+                  <div class="dash-ai-card__ring-label">
+                    <span class="dash-ai-card__ring-value" id="forecast-ring-text">87%</span>
+                    <span class="dash-ai-card__ring-text" data-i18n="farmer.confidenceScore">Confidence</span>
+                  </div>
+                </div>
+                <div class="dash-ai-card__price-forecast">
+                  <div class="dash-ai-card__forecast-row">
+                    <span class="dash-ai-card__forecast-label" data-i18n="ai.today">Today</span>
+                    <span class="dash-ai-card__forecast-val" id="forecast-mini-today">Loading...</span>
+                  </div>
+                  <div class="dash-ai-card__forecast-arrow"><i data-lucide="arrow-down"></i></div>
+                  <div class="dash-ai-card__forecast-row dash-ai-card__forecast-row--highlight">
+                    <span class="dash-ai-card__forecast-label" id="forecast-mini-target-label">In <span
+                        data-i18n="ai.sevenDays">7 Days</span></span>
+                    <span class="dash-ai-card__forecast-val" id="forecast-mini-target">Loading...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="dash-forecast-loading" id="forecast-loading" style="display: none;">
+              <div class="dash-spinner"></div>
+              <h4 data-i18n="ai.analyzingMarket">Analyzing market data across 42 mandis...</h4>
+              <p data-i18n="ai.evaluatingMarket">Evaluating buyer inquiries, weather projections, arrival volumes, and
+                historical seasonality.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── 1.5 SELL NOW VS STORE & HOLD ROI DECISION PANEL ── -->
+        <div class="dash-card"
+          style="margin-top:20px; background:#FFFFFF; border:2px solid #D8C28A; border-radius:16px; padding:22px 24px; box-shadow:0 4px 18px rgba(201,151,59,0.08);">
+          <div
+            style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:22px;">⚖️</span>
+              <div>
+                <h3 style="font-size:17px; font-weight:800; color:var(--ks-evergreen); margin:0;"
+                  data-i18n="ai.sellNowVsStoreAnalysis">Sell Now vs. Store &amp; Hold AI Analysis</h3>
+                <span style="font-size:12px; color:#666;" data-i18n="ai.sellNowVsStoreSubtitle">Will storing your crop
+                  yield higher net profit after deducting warehouse rent &amp; weight loss?</span>
+              </div>
+            </div>
+            <span
+              style="background:#E8F5E9; color:#2E7D32; font-size:11.5px; font-weight:800; padding:4px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:4px;">
+              <i data-lucide="check-circle" style="width:13px;height:13px;"></i> <span
+                data-i18n="ai.recommendationStoreHold">RECOMMENDATION: STORE &amp; HOLD</span>
+            </span>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:14px;">
+            <!-- Option A -->
+            <div style="background:#FDFBF7; border:1.5px solid #E5E1D8; border-radius:12px; padding:14px 16px;">
+              <div style="font-size:11px; font-weight:800; color:#795548;" data-i18n="ai.optionASellNow">OPTION A — SELL
+                NOW</div>
+              <div style="font-size:20px; font-weight:800; color:#222; margin:4px 0;">₹71,250 <span
+                  style="font-size:12px; font-weight:500; color:#666;">(₹2,850/q × 25q)</span></div>
+              <div style="font-size:12px; color:#666;">Immediate payment · 0 storage cost · 0 shrinkage risk</div>
+            </div>
+
+            <!-- Option B -->
+            <div style="background:#F1F8F3; border:2px solid #2E7D32; border-radius:12px; padding:14px 16px;">
+              <div style="font-size:11px; font-weight:800; color:#2E7D32;" data-i18n="ai.optionBStore">OPTION B — STORE
+                FOR 30 DAYS (RECOMMENDED)</div>
+              <div style="font-size:20px; font-weight:800; color:#2E7D32; margin:4px 0;">₹74,250 <span
+                  style="font-size:12px; font-weight:700; color:#2E7D32;">(+₹3,000 net extra gain)</span></div>
+              <div style="font-size:12px; color:#555;">After ₹950 warehouse rent, ₹350 handling &amp; ₹650 moisture
+                shrinkage</div>
+            </div>
+          </div>
+
+          <div
+            style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-top:1px solid #EFEFEF; padding-top:12px;">
+            <div style="font-size:12.5px; color:#555;">
+              📍 Nearest Facility: <strong>Sahyadri Agro Cold Chain &amp; Warehouse (12 km)</strong> · ₹38/bag/month
+            </div>
+            <div style="display:flex; gap:8px;">
+              <a href="storage.html" class="btn btn--primary" style="padding:7px 12px; font-size:12px;">
+                <i data-lucide="warehouse"></i> <span data-i18n="ai.exploreStorageOptions">Explore Storage
+                  Options</span>
+              </a>
+              <a href="storage.html#storage-calculator" class="btn btn--secondary"
+                style="padding:7px 12px; font-size:12px;">
+                <i data-lucide="calculator"></i> <span data-i18n="ai.customCalculator">Custom Calculator</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── 2. SMART SELLING OPPORTUNITY ── -->
+    <section class="dash-section" id="dash-selling-opp">
+      <div class="container">
+        <div class="dash-opp-card" id="opp-card">
+          <div class="dash-opp-card__badge-row">
+            <span class="dash-opp-pill"><i data-lucide="sparkles"></i> <span data-i18n="farmer.topBuyingOpportunity">Top
+                Buying Opportunity</span></span>
+            <span class="dash-opp-verified"><i data-lucide="shield-check"></i> <span
+                data-i18n="farmer.verifiedBuyerTag">Verified Institutional Buyer · Shah Agro Trading</span></span>
+          </div>
+          <div class="dash-opp-card__main">
+            <div class="dash-opp-card__icon" aria-hidden="true">🌾</div>
+            <div class="dash-opp-card__content">
+              <div class="dash-opp-card__crop-row">
+                <h3 class="dash-opp-card__title" data-i18n="ai.smartSellingOpp">Smart Selling Opportunity</h3>
+                <span class="dash-opp-rec-chip" data-i18n="farmer.recommendationFpoConsolidation">⚡ SELL TO FPO
+                  CONSOLIDATION · 92% CONFIDENCE</span>
+              </div>
+              <p class="dash-opp-card__desc" data-i18n="ai.oppInventoryDesc">Your listed crop inventory is currently
+                worth approximately:</p>
+              <div class="dash-opp-card__metrics">
+                <div class="dash-opp-metric">
+                  <span class="dash-opp-metric__lbl" data-i18n="ai.currentMarket">Current Market</span>
+                  <strong class="dash-opp-metric__val" id="opp-cur-price">Loading...</strong>
+                  <span class="dash-opp-metric__sub" data-i18n="farmer.vashiBenchmark">APMC Benchmark</span>
+                </div>
+                <div class="dash-opp-metric-divider" aria-hidden="true"><i data-lucide="arrow-right"></i></div>
+                <div class="dash-opp-metric dash-opp-metric--featured">
+                  <span class="dash-opp-metric__lbl" data-i18n="ai.recommendedTarget">Recommended Target</span>
+                  <strong class="dash-opp-metric__val dash-opp-metric__val--green" id="opp-rec-price">₹2,950
+                    <small>/q</small></strong>
+                  <span class="dash-opp-metric__premium" data-i18n="farmer.marketLinked">+₹70/q market-linked</span>
+                </div>
+                <div class="dash-opp-metric-divider" aria-hidden="true">=</div>
+                <div class="dash-opp-metric dash-opp-metric--total">
+                  <span class="dash-opp-metric__lbl" data-i18n="ai.potentialExtra">Potential Extra Income</span>
+                  <strong class="dash-opp-metric__val dash-opp-metric__val--total" id="opp-extra-val">+₹2,500</strong>
+                  <span class="dash-opp-metric__sub" data-i18n="farmer.fullLotPayout">Full lot payout</span>
+                </div>
+              </div>
+              <div class="dash-opp-factors">
+                <span class="dash-opp-factor-item">📊 High institutional demand</span>
+                <span class="dash-opp-factor-item">⏱️ Peak price window in 48h</span>
+                <span class="dash-opp-factor-item">🛡️ Guaranteed escrow settlement</span>
+              </div>
+            </div>
+            <div class="dash-opp-card__action">
+              <a href="buyers.html" class="btn btn--primary dash-opp-btn" id="btn-find-buyer">
+                <i data-lucide="search"></i> <span data-i18n="ai.findBestBuyer">Find Best Buyer</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer dash-footer">
+    <div class="container">
+      <div class="footer__inner">
+        <div>
+          <div class="footer__brand"><i data-lucide="sprout"
+              style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:4px;"></i>
+            KhetSetu</div>
+          <div class="footer__tagline">Know the Price. Choose the Market. Sell Better.</div>
+        </div>
+        <div class="footer__links">
+          <a href="#" class="footer__link" onclick="openHelpModal()">Kisan Support</a>
+          <a href="buyers.html" class="footer__link">For Buyers</a>
+          <a href="index.html" class="footer__link">About KhetSetu</a>
+        </div>
+      </div>
+      <div class="footer__copyright">© 2026 KhetSetu AgriTech Platform. Built for Indian Farmers & FPOs.</div>
+    </div>
+  </footer>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="dash-bottom-nav" id="dash-bottom-nav">
+    <a href="dashboard.html" class="dash-bottom-nav__item" id="bnav-home"><i
+        data-lucide="home"></i><span>Home</span></a>
+    <a href="market.html" class="dash-bottom-nav__item" id="bnav-market"><i
+        data-lucide="bar-chart-3"></i><span>Market</span></a>
+    <a href="lots.html" class="dash-bottom-nav__item" id="bnav-lots"><i data-lucide="package"></i><span>My
+        Lots</span></a>
+    <a href="ai-forecast.html" class="dash-bottom-nav__item dash-bottom-nav__item--active" id="bnav-forecast"><i
+        data-lucide="brain"></i><span>Forecast</span></a>
+    <a href="buyers.html" class="dash-bottom-nav__item" id="bnav-buyers"><i
+        data-lucide="users"></i><span>Buyers</span></a>
+    <a href="orders.html" class="dash-bottom-nav__item" id="bnav-orders"><i
+        data-lucide="clipboard-list"></i><span>Orders</span></a>
+  </nav>
+
+  <!-- MODALS -->
+  <!-- ALERT MODAL -->
+  <div class="dash-modal-overlay" id="alert-modal-overlay">
+    <div class="dash-modal" id="alert-modal">
+      <div class="dash-modal__header">
+        <h3 data-i18n="farmer.createPriceAlert">Create Price Alert</h3>
+        <button class="dash-modal__close" id="alert-modal-close" aria-label="Close"><i data-lucide="x"></i></button>
+      </div>
+      <form class="dash-modal__form" id="alert-form">
+        <div class="dash-modal__field">
+          <label for="alert-crop-input" data-i18n="ai.selectCrop">Crop</label>
+          <select id="alert-crop-input" class="dash-filter-select" required>
+            <option value="rice">Rice</option>
+            <option value="wheat">Wheat</option>
+            <option value="onion">Onion</option>
+            <option value="tomato">Tomato</option>
+          </select>
+        </div>
+        <div class="dash-modal__field">
+          <label for="alert-price-input" data-i18n="farmer.targetPrice">Target Price (₹/quintal)</label>
+          <input type="number" id="alert-price-input" class="dash-form-input" placeholder="e.g. 3000" required>
+        </div>
+        <button type="submit" class="btn btn--primary dash-modal__submit"><i data-lucide="bell-ring"></i> <span
+            data-i18n="ai.setTargetAlert">Set Price Alert</span></button>
+      </form>
+    </div>
+  </div>
+
+  <!-- NOTIFICATIONS / PROFILE / HELPLINE / LANG MODALS -->
+  <div class="dash-modal-overlay" id="notifications-modal-overlay">
+    <div class="dash-modal dash-modal--sm" id="notifications-modal">
+      <div class="dash-modal__header">
+        <div>
+          <h3>Notifications</h3>
+        </div>
+        <button class="dash-modal__close" id="notifications-modal-close"><i data-lucide="x"></i></button>
+      </div>
+      <div class="dash-modal__body-pad" id="notifications-list"></div>
+    </div>
+  </div>
+
+  <div class="dash-modal-overlay" id="profile-modal-overlay">
+    <div class="dash-modal" id="profile-modal">
+      <div class="dash-modal__header">
+        <h3>Farmer Profile & Settings</h3>
+        <button class="dash-modal__close" id="profile-modal-close"><i data-lucide="x"></i></button>
+      </div>
+      <form class="dash-modal__form" id="profile-form">
+        <div class="dash-modal__field">
+          <label for="prof-name">Full Name</label>
+          <input type="text" id="prof-name" class="dash-form-input" value="Rajesh Patil" required>
+        </div>
+        <button type="submit" class="btn btn--primary dash-modal__submit"><i data-lucide="save"></i> Save
+          Settings</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="dash-modal-overlay" id="help-modal-overlay">
+    <div class="dash-modal" id="help-modal">
+      <div class="dash-modal__header">
+        <h3>Kisan Support & Helpline</h3>
+        <button class="dash-modal__close" id="help-modal-close"><i data-lucide="x"></i></button>
+      </div>
+      <div class="dash-modal__body-pad">
+        <div class="dash-help-banner">
+          <i data-lucide="phone-call"></i>
+          <div>
+            <div style="font-weight:700; color:var(--ks-evergreen);">Kisan Call Center (Toll Free)</div>
+            <div style="font-size:18px; font-weight:800; color:var(--ks-sage);">1800-180-1551</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATIONS / PROFILE / HELPLINE MODALS -->
+  <div class="dash-modal-overlay" id="notifications-modal-overlay">
+    <div class="dash-modal dash-modal--sm" id="notifications-modal">
+      <div class="dash-modal__header">
+        <div>
+          <h3>Notifications</h3>
+        </div>
+        <button class="dash-modal__close" id="notifications-modal-close"><i data-lucide="x"></i></button>
+      </div>
+      <div class="dash-modal__body-pad" id="notifications-list"></div>
+    </div>
+  </div>
+
+  <div class="dash-modal-overlay" id="profile-modal-overlay">
+    <div class="dash-modal" id="profile-modal">
+      <div class="dash-modal__header">
+        <h3>Farmer Profile & Settings</h3>
+        <button class="dash-modal__close" id="profile-modal-close"><i data-lucide="x"></i></button>
+      </div>
+      <form class="dash-modal__form" id="profile-form">
+        <div class="dash-modal__field">
+          <label for="prof-name">Full Name</label>
+          <input type="text" id="prof-name" class="dash-form-input" value="Rajesh Patil" required>
+        </div>
+        <button type="submit" class="btn btn--primary dash-modal__submit"><i data-lucide="save"></i> Save
+          Settings</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="dash-modal-overlay" id="help-modal-overlay">
+    <div class="dash-modal" id="help-modal">
+      <div class="dash-modal__header">
+        <h3>Kisan Support & Helpline</h3>
+        <button class="dash-modal__close" id="help-modal-close"><i data-lucide="x"></i></button>
+      </div>
+      <div class="dash-modal__body-pad">
+        <div class="dash-help-banner">
+          <i data-lucide="phone-call"></i>
+          <div>
+            <div style="font-weight:700; color:var(--ks-evergreen);">Kisan Call Center (Toll Free)</div>
+            <div style="font-size:18px; font-weight:800; color:var(--ks-sage);">1800-180-1551</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Multilingual Support (Farmer) -->
+  <script src="js/translations.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/page-guard.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/dashboard.js"></script>
+  <!-- Krishi Sahayak AI Market Assistant -->
+  <script src="js/krishi-sahayak.js"></script>
+</body>
+
+</html>
+
+</html>

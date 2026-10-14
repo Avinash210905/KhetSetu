@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KhetSetu — Create Account & Register</title>
+  <meta name="description"
+    content="Register for KhetSetu AgriTech platform to discover live mandi prices, AI-driven crop forecasting, and verified buyer networks.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap"
+    rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <!-- i18n -->
+  <script src="js/translations.js"></script>
+  <script src="js/i18n.js"></script>
+</head>
+
+<body>
+
+  <!-- ════════════════════════════════════════
+       SPLIT-SCREEN AUTHENTICATION PAGE
+       ════════════════════════════════════════ -->
+  <div class="auth-wrapper">
+
+    <!-- ── Left Visual Column (Desktop) ── -->
+    <aside class="auth-hero" aria-label="Visual Brand Story">
+      <div class="auth-hero__bg">
+        <img src="assets/images/hero-farm.jpg"
+          alt="Indian farmers working in lush green terrace fields at golden sunrise" id="auth-hero-img">
+      </div>
+      <div class="auth-hero__overlay"></div>
+
+      <!-- Top Brand Logo -->
+      <div class="auth-hero__top">
+        <a href="index.html" class="auth-hero__logo" title="Back to KhetSetu Home">
+          <div class="auth-hero__logo-icon"><i data-lucide="sprout"></i></div>
+          <span class="auth-hero__logo-text">KhetSetu</span>
+        </a>
+      </div>
+
+      <!-- Bottom Headline & Value Proposition -->
+      <div class="auth-hero__bottom">
+        <h1 class="auth-hero__headline" id="hero-headline">
+          <span data-i18n="auth.heroHeadline1">Sell smarter.</span><br>
+          <span data-i18n="auth.heroHeadline2">Discover better</span><br>
+          <em data-i18n="auth.heroHeadline3">markets.</em>
+        </h1>
+        <p class="auth-hero__subtitle" id="hero-subtitle" data-i18n="auth.heroSubtitle">
+          Join India's leading agricultural intelligence network connecting farmers directly with verified buyers and
+          AI-powered mandi insights.
+        </p>
+
+        <div class="auth-hero__badges">
+          <div class="auth-hero__badge-item">
+            <span class="auth-hero__badge-dot"></span>
+            <span id="badge-farmers" data-i18n="auth.badgeFarmers">50,000+ Active Farmers</span>
+          </div>
+          <div class="auth-hero__badge-item">
+            <span class="auth-hero__badge-dot"></span>
+            <span id="badge-mandis" data-i18n="auth.badgeMandis">120+ APMC Mandis</span>
+          </div>
+          <div class="auth-hero__badge-item">
+            <span class="auth-hero__badge-dot"></span>
+            <span id="badge-verified" data-i18n="auth.badgeVerified">100% Verified Buyers</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── Right Form Column ── -->
+    <main class="auth-content">
+      <div class="auth-card-box">
+
+        <!-- Header Text -->
+        <header class="auth-header">
+          <h2 class="auth-header__title" id="auth-title" data-i18n="auth.createAccount">Create Account</h2>
+          <p class="auth-header__subtitle" id="auth-subtitle" data-i18n="auth.joinKrishi">Join KhetSetu and discover better market rates</p>
+        </header>
+
+        <!-- Mode Toggle Tabs (Login / Register) -->
+        <div class="auth-tabs" id="auth-tabs-container">
+          <a href="login.html" class="auth-tab-btn" id="tab-btn-login" data-i18n="auth.tabLogin">Log In</a>
+          <button type="button" class="auth-tab-btn active" id="tab-btn-register" data-i18n="auth.tabRegister">Register</button>
+        </div>
+
+        <!-- ── REGISTRATION FORM ── -->
+        <form id="auth-register-form" class="auth-form" novalidate>
+          <div id="register-alert" class="auth-alert"></div>
+
+          <!-- Role Selector -->
+          <div class="auth-roles-group">
+            <label class="auth-roles-label" id="label-role" data-i18n="auth.iAmA">I AM A...</label>
+            <div class="auth-roles" role="radiogroup" aria-labelledby="label-role">
+
+              <div class="auth-role-card active" data-role="farmer" tabindex="0" role="radio" aria-checked="true">
+                <span class="auth-role-card__icon"><i data-lucide="tractor"></i></span>
+                <span class="auth-role-card__name" id="role-name-farmer" data-i18n="auth.roleFarmer">Farmer</span>
+                <span class="auth-role-card__check">✓</span>
+              </div>
+
+              <div class="auth-role-card" data-role="fpo" tabindex="0" role="radio" aria-checked="false">
+                <span class="auth-role-card__icon"><i data-lucide="users"></i></span>
+                <span class="auth-role-card__name" id="role-name-fpo" data-i18n="auth.roleFPO">FPO</span>
+                <span class="auth-role-card__check">✓</span>
+              </div>
+
+              <div class="auth-role-card" data-role="buyer" tabindex="0" role="radio" aria-checked="false">
+                <span class="auth-role-card__icon"><i data-lucide="store"></i></span>
+                <span class="auth-role-card__name" id="role-name-buyer" data-i18n="auth.roleBuyer">Buyer</span>
+                <span class="auth-role-card__check">✓</span>
+              </div>
+
+              <div class="auth-role-card" data-role="transporter" tabindex="0" role="radio" aria-checked="false">
+                <span class="auth-role-card__icon"><i data-lucide="truck"></i></span>
+                <span class="auth-role-card__name" id="role-name-transporter" data-i18n="auth.roleTransporter">Transporter</span>
+                <span class="auth-role-card__check">✓</span>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Full Name Input -->
+          <div class="auth-input-group">
+            <label class="auth-input-label" for="register-name" id="label-register-name" data-i18n="auth.labelFullName">FULL NAME</label>
+            <div class="auth-text-box">
+              <input type="text" id="register-name" class="auth-text-box__input" placeholder="e.g. Rajesh Patil" data-i18n-placeholder="auth.placeholderName"
+                autocomplete="name" required>
+            </div>
+          </div>
+
+          <!-- Email Input -->
+          <div class="auth-input-group">
+            <label class="auth-input-label" for="register-email" id="label-register-email" data-i18n="auth.labelEmailAddress">EMAIL ADDRESS</label>
+            <div class="auth-text-box">
+              <input type="email" id="register-email" class="auth-text-box__input" placeholder="farmer@example.com" data-i18n-placeholder="auth.placeholderEmail"
+                autocomplete="email" required>
+            </div>
+          </div>
+
+          <!-- Mobile Number Input -->
+          <div class="auth-input-group">
+            <label class="auth-input-label" for="register-phone" id="label-phone" data-i18n="auth.labelPhone">MOBILE NUMBER</label>
+            <div class="auth-phone-box">
+              <div class="auth-phone-box__prefix">
+                <span>🇮🇳</span>
+                <span>+91</span>
+              </div>
+              <input type="tel" id="register-phone" class="auth-phone-box__input" placeholder="10-digit number" data-i18n-placeholder="auth.placeholderPhone"
+                maxlength="10" inputmode="numeric" pattern="[0-9]{10}" autocomplete="tel-national">
+            </div>
+          </div>
+
+          <!-- Password Input -->
+          <div class="auth-input-group">
+            <label class="auth-input-label" for="register-password" id="label-register-password" data-i18n="auth.labelPasswordCreate">PASSWORD</label>
+            <div class="auth-text-box">
+              <input type="password" id="register-password" class="auth-text-box__input"
+                placeholder="Minimum 6 characters" autocomplete="new-password" required>
+              <button type="button" class="auth-toggle-pass-btn" data-target="register-password"
+                aria-label="Toggle password visibility">
+                <i data-lucide="eye" style="width:16px;height:16px;"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Register Action Button -->
+          <button type="submit" class="auth-btn-primary" id="btn-register">
+            <span id="btn-register-text" data-i18n="auth.btnRegister">Register & Send OTP</span>
+            <span class="auth-btn-arrow">→</span>
+          </button>
+
+          <p class="auth-switch-prompt">
+            <span id="text-have-account" data-i18n="auth.alreadyHaveAccount">Already have an account?</span>
+            <a href="login.html" class="auth-switch-link" id="link-to-login" data-i18n="auth.linkLogin">Log In</a>
+          </p>
+        </form>
+
+        <!-- ── OTP VERIFICATION STEP (Hidden Initially) ── -->
+        <div class="auth-otp-step" id="otp-step-container">
+          <div id="otp-alert" class="auth-alert"></div>
+
+          <div style="margin-bottom: 20px;">
+            <label class="auth-input-label" id="label-otp" data-i18n="auth.labelOtp">ENTER 6-DIGIT EMAIL OTP</label>
+            <div style="font-size: 13.5px; color: #6F7F75; margin-bottom: 12px;">
+              <span id="otp-sent-text" data-i18n="auth.otpSentTo">Verification code sent to</span>
+              <strong id="display-user-email"
+                style="color: #12372A; margin: 0 4px; word-break: break-all;">user@example.com</strong>
+              <button type="button" class="auth-otp-change-num" id="btn-change-email">
+                <i data-lucide="edit-3" style="width:12px;height:12px;vertical-align:middle;"></i>
+                <span id="btn-edit-text" data-i18n="auth.btnChange">Change</span>
+              </button>
+            </div>
+
+            <!-- 6-box OTP entry -->
+            <div class="auth-otp-boxes" id="otp-inputs">
+              <input type="text" class="auth-otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]*"
+                autocomplete="one-time-code" required>
+              <input type="text" class="auth-otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]*" required>
+              <input type="text" class="auth-otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]*" required>
+              <input type="text" class="auth-otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]*" required>
+              <input type="text" class="auth-otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]*" required>
+              <input type="text" class="auth-otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]*" required>
+            </div>
+          </div>
+
+          <!-- OTP Timer and Resend -->
+          <div class="auth-otp-meta">
+            <span class="auth-otp-timer" id="otp-timer-display"><span data-i18n="auth.timerLabel">Resend OTP in</span> <strong
+                id="timer-count">60</strong>s</span>
+            <button type="button" class="auth-otp-resend-btn" id="btn-resend-otp" data-i18n="auth.btnResend" disabled>Resend Code</button>
+          </div>
+
+          <!-- Verify Button -->
+          <button type="button" class="auth-btn-primary" id="btn-verify-otp">
+            <span id="btn-verify-text" data-i18n="auth.btnVerify">Verify & Continue</span>
+            <span class="auth-btn-arrow">→</span>
+          </button>
+
+          <p class="auth-switch-prompt" style="margin-top: 14px;">
+            <a href="login.html" class="auth-switch-link" id="link-back-to-login" data-i18n="auth.backToLogin">← Back to Log In</a>
+          </p>
+        </div>
+
+        <!-- Trust & Security Footer -->
+        <div class="auth-trust-divider"></div>
+        <div class="auth-trust-items">
+          <span class="auth-trust-item"><i data-lucide="shield-check"
+              style="width:14px;height:14px;color:#5B9A72;vertical-align:middle;"></i> <span
+              id="trust-secure">Secure</span></span>
+          <span class="auth-trust-dot">•</span>
+          <span class="auth-trust-item"><i data-lucide="zap"
+              style="width:14px;height:14px;color:#D6A84F;vertical-align:middle;"></i> <span
+              id="trust-simple">Simple</span></span>
+          <span class="auth-trust-dot">•</span>
+          <span class="auth-trust-item"><i data-lucide="eye"
+              style="width:14px;height:14px;color:#3B82F6;vertical-align:middle;"></i> <span
+              id="trust-transparent">Transparent</span></span>
+        </div>
+        <p class="auth-secure-subtext">
+          <i data-lucide="lock" style="width:13px;height:13px;color:#5B9A72;vertical-align:middle;"></i>
+          <span id="text-privacy" data-i18n="auth.privacyText">Your data is secure and protected under AgriStack guidelines.</span>
+        </p>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Central Auth & API Configuration -->
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+
+  <!-- ════════════════════════════════════════
+       JAVASCRIPT INTERACTION & API INTEGRATION
+       ════════════════════════════════════════ -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+
+      const isLocal = window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+      const API_BASE = (typeof window.resolveApiBaseUrl === 'function'
+        ? window.resolveApiBaseUrl()
+        : (window.API_BASE_URL || (window.location && window.location.origin && !isLocal ? `${window.location.origin}/api` : 'http://127.0.0.1:5000/api'))).replace(/\/+$/, '');
+
+      // Elements
+      const tabsContainer = document.getElementById('auth-tabs-container');
+      const registerForm = document.getElementById('auth-register-form');
+      const otpStepContainer = document.getElementById('otp-step-container');
+
+      // Register elements
+      const registerName = document.getElementById('register-name');
+      const registerEmail = document.getElementById('register-email');
+      const registerPhone = document.getElementById('register-phone');
+      const registerPassword = document.getElementById('register-password');
+      const btnRegister = document.getElementById('btn-register');
+      const registerAlert = document.getElementById('register-alert');
+      const roleCards = document.querySelectorAll('.auth-role-card');
+
+      // OTP elements
+      const displayUserEmail = document.getElementById('display-user-email');
+      const btnChangeEmail = document.getElementById('btn-change-email');
+      const otpBoxes = Array.from(document.querySelectorAll('.auth-otp-box'));
+      const otpAlert = document.getElementById('otp-alert');
+      const btnVerifyOtp = document.getElementById('btn-verify-otp');
+      const timerCount = document.getElementById('timer-count');
+      const btnResendOtp = document.getElementById('btn-resend-otp');
+      const otpTimerDisplay = document.getElementById('otp-timer-display');
+
+      let currentRole = 'farmer';
+      let countdown = 60;
+      let timerInterval = null;
+      let activeOtpEmail = '';
+
+      // ── UI Alert Helpers ──
+      function showAlert(element, message, type = 'error') {
+        if (!element) return;
+        element.textContent = message;
+        element.className = `auth-alert auth-alert--${type}`;
+        element.style.display = 'block';
+      }
+
+      function showStructuredAlert(element, { title, message, actionText, actionCallback, type = 'warning' }) {
+        if (!element) return;
+        element.className = `auth-alert auth-alert--${type}`;
+        element.innerHTML = `
+          <div class="auth-alert-content">
+            <div class="auth-alert-title">
+              <i data-lucide="${type === 'warning' ? 'alert-triangle' : 'alert-circle'}" style="width:14px;height:14px;"></i>
+              <span>${title}</span>
+            </div>
+            <div class="auth-alert-msg">${message}</div>
+            ${actionText ? `<button type="button" class="auth-alert-action-btn" id="alert-action-btn">${actionText}</button>` : ''}
+          </div>
+        `;
+        element.style.display = 'block';
+        if (window.lucide) lucide.createIcons();
+
+        if (actionText && typeof actionCallback === 'function') {
+          const btn = element.querySelector('#alert-action-btn');
+          if (btn) btn.addEventListener('click', actionCallback);
+        }
+      }
+
+      function hideAlert(element) {
+        if (!element) return;
+        element.style.display = 'none';
+        element.textContent = '';
+      }
+
+      // ── Password Visibility Toggle ──
+      document.querySelectorAll('.auth-toggle-pass-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetId = btn.dataset.target;
+          const input = document.getElementById(targetId);
+          if (input) {
+            const isPass = input.type === 'password';
+            input.type = isPass ? 'text' : 'password';
+            btn.innerHTML = `<i data-lucide="${isPass ? 'eye-off' : 'eye'}" style="width:16px;height:16px;"></i>`;
+            if (window.lucide) lucide.createIcons();
+          }
+        });
+      });
+
+      function showRegisterForm() {
+        tabsContainer.style.display = 'flex';
+        registerForm.style.display = 'block';
+        otpStepContainer.classList.remove('active');
+
+        document.getElementById('auth-title').textContent = 'Create Account';
+        document.getElementById('auth-subtitle').textContent = 'Join KhetSetu and discover better market rates';
+        hideAlert(registerAlert);
+      }
+
+      function showOtpStep(email) {
+        activeOtpEmail = email;
+        displayUserEmail.textContent = email;
+        tabsContainer.style.display = 'none';
+        registerForm.style.display = 'none';
+        otpStepContainer.classList.add('active');
+
+        document.getElementById('auth-title').textContent = 'Verify Email';
+        document.getElementById('auth-subtitle').textContent = 'Enter the 6-digit OTP sent to your email inbox';
+
+        hideAlert(otpAlert);
+        startResendTimer();
+        otpBoxes.forEach(b => b.value = '');
+        otpBoxes[0].focus();
+      }
+
+      btnChangeEmail.addEventListener('click', showRegisterForm);
+
+      // ── Role Selector ──
+      roleCards.forEach(card => {
+        card.addEventListener('click', () => {
+          roleCards.forEach(c => {
+            c.classList.remove('active');
+            c.setAttribute('aria-checked', 'false');
+          });
+          card.classList.add('active');
+          card.setAttribute('aria-checked', 'true');
+          currentRole = card.dataset.role;
+        });
+
+        card.addEventListener('keydown', (e) => {
+          if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            card.click();
+          }
+        });
+      });
+
+      // Phone Input Formatting
+      registerPhone.addEventListener('input', (e) => {
+        let val = e.target.value.replace(/\D/g, '');
+        if (val.length > 10) val = val.slice(0, 10);
+        e.target.value = val;
+      });
+
+      // ── Timer Handler (60s Cooldown) ──
+      function startResendTimer() {
+        countdown = 60;
+        btnResendOtp.disabled = true;
+        otpTimerDisplay.style.display = 'inline';
+        timerCount.textContent = countdown;
+
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+          countdown--;
+          timerCount.textContent = countdown;
+          if (countdown <= 0) {
+            clearInterval(timerInterval);
+            otpTimerDisplay.style.display = 'none';
+            btnResendOtp.disabled = false;
+          }
+        }, 1000);
+      }
+
+      // ── 6-Box OTP Input Handling ──
+      otpBoxes.forEach((box, idx) => {
+        box.addEventListener('input', (e) => {
+          const val = e.target.value.replace(/\D/g, '');
+          e.target.value = val ? val[val.length - 1] : '';
+          hideAlert(otpAlert);
+
+          if (e.target.value && idx < otpBoxes.length - 1) {
+            otpBoxes[idx + 1].focus();
+          }
+        });
+
+        box.addEventListener('keydown', (e) => {
+          if (e.key === 'Backspace' && !box.value && idx > 0) {
+            otpBoxes[idx - 1].focus();
+          }
+        });
+
+        box.addEventListener('paste', (e) => {
+          e.preventDefault();
+          const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+          if (pasted.length > 0) {
+            pasted.split('').forEach((char, i) => {
+              if (otpBoxes[i]) otpBoxes[i].value = char;
+            });
+            const nextFocus = Math.min(pasted.length, 5);
+            otpBoxes[nextFocus].focus();
+          }
+        });
+      });
+
+      function getEnteredOtp() {
+        return otpBoxes.map(b => b.value).join('');
+      }
+
+      // ── REGISTER API HANDLER ──
+      registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        hideAlert(registerAlert);
+
+        const name = registerName.value.trim();
+        const email = registerEmail.value.trim();
+        const phone = registerPhone.value.trim();
+        const password = registerPassword.value;
+
+        if (!name || !email || !password) {
+          showAlert(registerAlert, 'Please fill in all required fields.');
+          return;
+        }
+
+        if (password.length < 6) {
+          showAlert(registerAlert, 'Password must be at least 6 characters long.');
+          return;
+        }
+
+        btnRegister.disabled = true;
+        btnRegister.innerHTML = 'Sending OTP… <span class="auth-btn-arrow">⏳</span>';
+
+        try {
+          const res = await fetch(`${API_BASE}/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name,
+              email,
+              phone,
+              password,
+              role: currentRole
+            })
+          });
+
+          let data;
+          try {
+            data = await res.json();
+          } catch (pe) {
+            data = { success: res.ok, message: 'Invalid response from server' };
+          }
+
+          if (res.ok && data.success) {
+            btnRegister.disabled = false;
+            btnRegister.innerHTML = '<span id="btn-register-text">Create Account</span> <span class="auth-btn-arrow">→</span>';
+
+            showOtpStep(email);
+            showAlert(otpAlert, data.message || 'Registration successful. Check your email for the OTP.', 'success');
+          } else if (data.message && (data.message.includes('verification email could not be sent') || data.message.includes('Resend OTP'))) {
+            btnRegister.disabled = false;
+            btnRegister.innerHTML = '<span id="btn-register-text">Create Account</span> <span class="auth-btn-arrow">→</span>';
+
+            showStructuredAlert(registerAlert, {
+              title: 'Verification email not sent',
+              message: "Your account was created, but we couldn't send the verification email. You can request a new OTP.",
+              actionText: 'Resend OTP ↻',
+              actionCallback: async () => {
+                showOtpStep(email);
+                showAlert(otpAlert, 'Requesting a new verification code…');
+                try {
+                  const resendRes = await fetch(`${API_BASE}/auth/resend-verification`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                  });
+                  const resendData = await resendRes.json();
+                  if (resendRes.ok && resendData.success) {
+                    showAlert(otpAlert, resendData.message || 'A new verification OTP has been sent.', 'success');
+                  } else {
+                    showAlert(otpAlert, resendData.message || 'Could not send OTP. Please try again in a few seconds.');
+                  }
+                } catch (rErr) {
+                  showAlert(otpAlert, 'Unable to connect to server to resend OTP.');
+                }
+              },
+              type: 'warning'
+            });
+          } else {
+            btnRegister.disabled = false;
+            btnRegister.innerHTML = '<span id="btn-register-text">Create Account</span> <span class="auth-btn-arrow">→</span>';
+            showAlert(registerAlert, data.message || 'Registration failed. Please try again.');
+          }
+        } catch (err) {
+          console.error('[Register Network Error]:', err);
+          btnRegister.disabled = false;
+          btnRegister.innerHTML = '<span id="btn-register-text">Create Account</span> <span class="auth-btn-arrow">→</span>';
+          showAlert(registerAlert, 'Unable to connect to KhetSetu server. Please make sure the backend server is running.');
+        }
+      });
+
+      // ── VERIFY OTP API HANDLER ──
+      btnVerifyOtp.addEventListener('click', async () => {
+        hideAlert(otpAlert);
+        const otp = getEnteredOtp();
+
+        if (otp.length < 6) {
+          showAlert(otpAlert, 'Please enter all 6 digits.');
+          return;
+        }
+
+        btnVerifyOtp.disabled = true;
+        btnVerifyOtp.innerHTML = 'Verifying… <span class="auth-btn-arrow">⏳</span>';
+
+        try {
+          const res = await fetch(`${API_BASE}/auth/verify-email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: activeOtpEmail,
+              otp: otp
+            })
+          });
+
+          let data;
+          try {
+            data = await res.json();
+          } catch (pe) {
+            data = { success: res.ok, message: 'Invalid response from server' };
+          }
+
+          if (res.ok && data.success) {
+            btnVerifyOtp.innerHTML = 'Verified! ✓';
+            btnVerifyOtp.style.background = '#5B9A72';
+
+            showAlert(otpAlert, 'Email verified successfully! Redirecting to login…', 'success');
+
+            setTimeout(() => {
+              window.location.href = `login.html?verified=true&email=${encodeURIComponent(activeOtpEmail)}`;
+            }, 1200);
+          } else {
+            btnVerifyOtp.disabled = false;
+            btnVerifyOtp.innerHTML = '<span id="btn-verify-text">Verify & Continue</span> <span class="auth-btn-arrow">→</span>';
+            showAlert(otpAlert, data.message || 'Invalid or expired OTP.');
+          }
+        } catch (err) {
+          console.error('[Verify OTP Network Error]:', err);
+          btnVerifyOtp.disabled = false;
+          btnVerifyOtp.innerHTML = '<span id="btn-verify-text">Verify & Continue</span> <span class="auth-btn-arrow">→</span>';
+          showAlert(otpAlert, 'Unable to connect to KhetSetu server. Please make sure the backend server is running.');
+        }
+      });
+
+      // ── RESEND OTP API HANDLER ──
+      btnResendOtp.addEventListener('click', async () => {
+        hideAlert(otpAlert);
+        btnResendOtp.disabled = true;
+        btnResendOtp.textContent = 'Sending…';
+
+        try {
+          const res = await fetch(`${API_BASE}/auth/resend-verification`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: activeOtpEmail })
+          });
+
+          let data;
+          try {
+            data = await res.json();
+          } catch (pe) {
+            data = { success: res.ok, message: 'Invalid response from server' };
+          }
+
+          if (res.ok && data.success) {
+            btnResendOtp.textContent = 'Resend Code';
+            showAlert(otpAlert, data.message || 'A new verification OTP has been sent.', 'success');
+            startResendTimer();
+          } else {
+            btnResendOtp.disabled = false;
+            btnResendOtp.textContent = 'Resend Code';
+            showAlert(otpAlert, data.message || 'Failed to resend OTP.');
+          }
+        } catch (err) {
+          console.error('[Resend OTP Network Error]:', err);
+          btnResendOtp.disabled = false;
+          btnResendOtp.textContent = 'Resend Code';
+          showAlert(otpAlert, 'Unable to connect to KhetSetu server. Please make sure the backend server is running.');
+        }
+      });
+
+    });
+  </script>
+</body>
+
+</html>

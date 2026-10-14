@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Earnings & Financial Settlement | KhetSetu Transporter</title>
+  <meta name="description" content="Track completed freight, pending payments, escrow settlements, FASTag wallet debits, and verified transport income.">
+  
+  <!-- Google Fonts: Outfit + Playfair Display + Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="css/transporter.css">
+  <style>
+    @media (max-width: 768px) {
+      .earnings-table-desktop {
+        display: none;
+      }
+      .earnings-cards-mobile {
+        display: flex !important;
+      }
+    }
+    .earnings-cards-mobile {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      padding: 14px;
+    }
+    .earning-mobile-card {
+      background: var(--transporter-surface-warm);
+      border: 1px solid var(--transporter-border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+    }
+  </style>
+</head>
+<body data-require-role="transporter">
+
+  <!-- =========================================================================
+       HEADER & NAVIGATION BAR
+       ========================================================================= -->
+  <header class="trans-header">
+    <div class="trans-header-inner">
+      <a href="dashboard.html" class="trans-brand">
+        <div class="brand-icon-box"><i data-lucide="sprout"></i></div>
+        <span class="trans-brand-text">
+          Krishi<span>Shetra</span>
+          <span class="trans-brand-badge">Transporter Hub</span>
+        </span>
+      </a>
+
+      <nav>
+        <ul class="trans-nav-menu" id="transNavMenu">
+          <li><a href="dashboard.html" class="trans-nav-link"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+          <li><a href="available-loads.html" class="trans-nav-link"><i data-lucide="package-search"></i> Available Loads</a></li>
+          <li><a href="active-trips.html" class="trans-nav-link"><i data-lucide="truck"></i> Active Trips</a></li>
+          <li><a href="fleet.html" class="trans-nav-link"><i data-lucide="shield-check"></i> Fleet</a></li>
+          <li><a href="drivers.html" class="trans-nav-link"><i data-lucide="users"></i> Drivers</a></li>
+          <li><a href="earnings.html" class="trans-nav-link active"><i data-lucide="wallet"></i> Earnings</a></li>
+          <li><a href="profile.html" class="trans-nav-link"><i data-lucide="user-check"></i> Profile</a></li>
+          <li class="trans-mobile-logout"><a href="javascript:void(0)" class="trans-nav-link trans-nav-link--danger" onclick="if(window.Auth&&typeof window.Auth.logout==='function'){window.Auth.logout();}else{localStorage.clear();window.location.href='../login.html';}"><i data-lucide="log-out"></i> Logout / Sign Out</a></li>
+        </ul>
+      </nav>
+
+      <div class="trans-header-actions">
+        <a href="../index.html" class="portal-switch-btn" title="Go to FPO Dashboard">
+          <i data-lucide="repeat" style="width:14px;height:14px;"></i> FPO Hub
+        </a>
+
+        <button class="trans-btn-icon" title="Notifications" onclick="showToast('Freight payment of ₹34,225 credited to escrow wallet.')">
+          <i data-lucide="bell" style="width:18px;height:18px;"></i>
+          <span class="trans-notif-dot"></span>
+        </button>
+
+        <div class="trans-profile-wrap" id="transProfileWrap">
+          <button type="button" class="trans-user-pill" id="btnTransProfile" aria-expanded="false" aria-haspopup="true" aria-label="Transporter profile menu">
+            <div class="trans-user-avatar" id="transHeaderAvatar">KE</div>
+            <div class="trans-user-info">
+              <span class="trans-user-name" id="transHeaderName">Kisan Express</span>
+              <span class="trans-user-role">Gold Carrier ✓</span>
+            </div>
+            <i data-lucide="chevron-down" class="trans-user-chevron"></i>
+          </button>
+
+          <div class="trans-profile-dropdown" id="transProfileDropdown" role="menu">
+            <div class="trans-dropdown-header">
+              <div class="trans-user-avatar" style="width:38px;height:38px;font-size:14px;" id="transDropdownAvatar">KE</div>
+              <div style="overflow:hidden;">
+                <div class="trans-dropdown-name" id="transDropdownName">Kisan Express Logistics</div>
+                <div class="trans-dropdown-sub" id="transDropdownSub">Gold Carrier · VAHAN Verified</div>
+              </div>
+            </div>
+            <div class="trans-dropdown-sep"></div>
+            <a href="profile.html" class="trans-dropdown-item" role="menuitem"><i data-lucide="user-check"></i> Profile & Fleet Info</a>
+            <a href="onboarding.html" class="trans-dropdown-item" role="menuitem"><i data-lucide="shield-check"></i> Compliance & Permits</a>
+            <a href="earnings.html" class="trans-dropdown-item" role="menuitem"><i data-lucide="wallet"></i> FASTag & Earnings</a>
+            <div class="trans-dropdown-sep"></div>
+            <a href="javascript:void(0)" class="trans-dropdown-item trans-dropdown-item--danger" id="transLogoutBtn" role="menuitem"><i data-lucide="log-out"></i> Logout / Sign Out</a>
+          </div>
+        </div>
+
+        <button class="trans-hamburger" id="transHamburger" aria-label="Toggle navigation menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       MAIN CONTENT CONTAINER
+       ========================================================================= -->
+  <main class="trans-main">
+    <div class="trans-container">
+
+      <!-- Page Header -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:20px;">
+        <div>
+          <div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--transporter-primary);background:var(--transporter-surface-mint);padding:3px 9px;border-radius:var(--radius-full);margin-bottom:6px;">
+            <i data-lucide="shield-check" style="width:13px;height:13px;"></i> Zero TDS Escrow Account · Instant IMPS
+          </div>
+          <h1 style="font-size:26px;font-weight:800;color:var(--transporter-text);font-family:var(--font-serif);line-height:1.2;">
+            Earnings
+          </h1>
+          <p style="color:var(--transporter-muted);font-size:14px;margin-top:3px;">
+            Track completed freight, pending payments, and your transport income.
+          </p>
+        </div>
+        
+        <div style="display:flex;gap:10px;align-items:center;">
+          <button class="btn btn-secondary" onclick="showToast('Financial statement exported as CSV/Excel.', 'success')"><i data-lucide="file-spreadsheet"></i> Download Statement</button>
+          <button class="btn btn-amber" onclick="openWithdrawModal()"><i data-lucide="arrow-up-right"></i> Withdraw ₹92,500</button>
+        </div>
+      </div>
+
+      <!-- Top Financial Summary Metrics -->
+      <div class="stats-kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 20px;">
+        <div class="stat-kpi-card" style="background:#FAFDFB;border-color:#A7F3D0;">
+          <div class="stat-kpi-top">
+            <span class="stat-kpi-lbl">Total Earnings</span>
+            <div class="stat-kpi-icon green"><i data-lucide="wallet"></i></div>
+          </div>
+          <div class="stat-kpi-val" style="color:var(--transporter-primary);">₹28.40 L</div>
+          <div class="stat-kpi-sub">Lifetime Freight Turnover</div>
+        </div>
+
+        <div class="stat-kpi-card">
+          <div class="stat-kpi-top">
+            <span class="stat-kpi-lbl">This Month</span>
+            <div class="stat-kpi-icon blue"><i data-lucide="trending-up"></i></div>
+          </div>
+          <div class="stat-kpi-val">₹4,82,400</div>
+          <div class="stat-kpi-sub">+18.4% vs Previous Month</div>
+        </div>
+
+        <div class="stat-kpi-card">
+          <div class="stat-kpi-top">
+            <span class="stat-kpi-lbl">Pending</span>
+            <div class="stat-kpi-icon amber"><i data-lucide="clock"></i></div>
+          </div>
+          <div class="stat-kpi-val">₹92,500</div>
+          <div class="stat-kpi-sub">Ready for 1-Click Bank IMPS</div>
+        </div>
+
+        <div class="stat-kpi-card">
+          <div class="stat-kpi-top">
+            <span class="stat-kpi-lbl">Completed Trips</span>
+            <div class="stat-kpi-icon purple"><i data-lucide="check-circle"></i></div>
+          </div>
+          <div class="stat-kpi-val">486 Trips</div>
+          <div class="stat-kpi-sub">97.8% On-Time Delivery Rate</div>
+        </div>
+      </div>
+
+      <!-- Financial Visualizations: Revenue Trend & Operating Cost Breakdown -->
+      <div class="dashboard-grid-2" style="margin-bottom:24px;">
+        <div class="card-panel">
+          <div class="panel-header" style="margin-bottom:14px;">
+            <div>
+              <h3 class="panel-title" style="font-size:16px;">6-Month Freight Revenue Trend (₹ Lakhs)</h3>
+              <div class="panel-subtitle">Gross turnover across agricultural corridors</div>
+            </div>
+            <span class="status-badge available" style="font-size:11px;">Avg ₹4.45L / Mo</span>
+          </div>
+          <div style="height:240px;">
+            <canvas id="revenueTrendChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card-panel">
+          <div class="panel-header" style="margin-bottom:14px;">
+            <div>
+              <h3 class="panel-title" style="font-size:16px;">Operating Cost Breakdown</h3>
+              <div class="panel-subtitle">Fuel, tolls, maintenance & net profit margin</div>
+            </div>
+            <span class="status-badge pending" style="font-size:11px;">Net Margin: 38.5%</span>
+          </div>
+          <div style="height:240px;">
+            <canvas id="costBreakdownChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transaction / Earning List -->
+      <div class="card-panel" style="padding:0;overflow:hidden;">
+        <div style="padding:16px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--transporter-border-subtle);flex-wrap:wrap;gap:12px;">
+          <div>
+            <h3 style="font-size:16px;font-weight:800;color:var(--transporter-text);">Recent Freight Invoices & Settlements</h3>
+            <div style="font-size:12px;color:var(--transporter-muted);">Direct GST compliant invoices with E-Way Bill linkage</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="showToast('Invoice batch downloaded as ZIP.', 'success')"><i data-lucide="download"></i> Download All Invoices</button>
+        </div>
+
+        <!-- Desktop Table -->
+        <div class="earnings-table-desktop">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Invoice / Date</th>
+                <th>Trip & Commodity</th>
+                <th>Route Corridor</th>
+                <th>Gross Freight</th>
+                <th>FASTag / Deductions</th>
+                <th>Net Payout</th>
+                <th>Status</th>
+                <th style="text-align:right;">Receipt</th>
+              </tr>
+            </thead>
+            <tbody id="earningsTableBody">
+              <!-- Rendered via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Cards List -->
+        <div class="earnings-cards-mobile" id="earningsCardsMobile">
+          <!-- Rendered via JavaScript for clean mobile display without horizontal scrolling -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       FOOTER
+       ========================================================================= -->
+  <footer class="trans-footer">
+    <div class="trans-container trans-footer-inner">
+      <div>© 2026 KhetSetu Agri-Logistics Infrastructure Ltd. · VAHAN & Sarathi Integrated</div>
+      <div style="display:flex;gap:16px;">
+        <a href="onboarding.html">Compliance & Permits</a>
+        <a href="earnings.html">FASTag Escrow</a>
+        <a href="profile.html">Carrier Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/page-guard.js"></script>
+  <script src="js/transporter-data.js"></script>
+  <script src="js/transporter.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      renderEarningsData();
+      initCharts();
+    });
+
+    const transactions = [
+      { id: 'INV-2026-0891', date: '04 Sep 2026', trip: 'TRIP-9021', crop: '🧅 Red Onions (18.5 MT)', route: 'Lasalgaon ➔ Vashi APMC', gross: 34225, deductions: 684, net: 33541, status: 'Pending' },
+      { id: 'INV-2026-0890', date: '03 Sep 2026', trip: 'TRIP-9020', crop: '🍇 Export Table Grapes', route: 'Nashik ➔ JNPT Port', gross: 28500, deductions: 570, net: 27930, status: 'Paid' },
+      { id: 'INV-2026-0889', date: '01 Sep 2026', trip: 'TRIP-9019', crop: '🥭 Alphonso Mangoes (Reefer)', route: 'Ratnagiri ➔ Delhi', gross: 81600, deductions: 1632, net: 79968, status: 'Paid' },
+      { id: 'INV-2026-0888', date: '28 Aug 2026', trip: 'TRIP-9018', crop: '🌾 Sharbati Wheat (22 MT)', route: 'Sehore ➔ Surat APMC', gross: 42000, deductions: 840, net: 41160, status: 'Paid' },
+      { id: 'INV-2026-0887', date: '25 Aug 2026', trip: 'TRIP-9017', crop: '🍅 Hybrid Tomatoes (12 MT)', route: 'Junnar ➔ Mumbai APMC', gross: 22400, deductions: 448, net: 21952, status: 'Paid' }
+    ];
+
+    function renderEarningsData() {
+      // 1. Desktop Table
+      const tbody = document.getElementById('earningsTableBody');
+      if (tbody) {
+        tbody.innerHTML = transactions.map(t => {
+          let statusBadgeClass = t.status === 'Paid' ? 'available' : (t.status === 'Pending' ? 'pending' : 'in-transit');
+
+          return `
+            <tr>
+              <td>
+                <div style="font-weight:700;font-size:13px;color:var(--transporter-text);font-family:monospace;">${t.id}</div>
+                <div style="font-size:11.5px;color:var(--transporter-muted);">${t.date}</div>
+              </td>
+              <td>
+                <div style="font-weight:700;font-size:13px;color:var(--transporter-text);">${t.crop}</div>
+                <div style="font-size:11.5px;color:var(--transporter-primary);font-weight:600;">${t.trip}</div>
+              </td>
+              <td>
+                <div style="font-size:12.5px;font-weight:600;color:var(--transporter-text);">${t.route}</div>
+              </td>
+              <td>
+                <div style="font-size:13px;font-weight:700;color:var(--transporter-text);">₹${t.gross.toLocaleString()}</div>
+              </td>
+              <td style="color:var(--transporter-danger);font-size:12.5px;">
+                -₹${t.deductions.toLocaleString()}
+              </td>
+              <td>
+                <div style="font-size:14px;font-weight:800;color:var(--transporter-primary);">₹${t.net.toLocaleString()}</div>
+              </td>
+              <td>
+                <span class="status-badge ${statusBadgeClass}">
+                  ● ${t.status}
+                </span>
+              </td>
+              <td style="text-align:right;">
+                <button class="btn btn-secondary btn-sm" onclick="showToast('GST Invoice ${t.id} downloaded.', 'success')" title="Download GST Invoice"><i data-lucide="download"></i></button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // 2. Mobile Responsive Cards
+      const mobContainer = document.getElementById('earningsCardsMobile');
+      if (mobContainer) {
+        mobContainer.innerHTML = transactions.map(t => {
+          let statusBadgeClass = t.status === 'Paid' ? 'available' : (t.status === 'Pending' ? 'pending' : 'in-transit');
+
+          return `
+            <div class="earning-mobile-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+                <div>
+                  <div style="font-weight:700;font-size:13px;font-family:monospace;">${t.id}</div>
+                  <div style="font-size:11.5px;color:var(--transporter-muted);">${t.date} · ${t.trip}</div>
+                </div>
+                <span class="status-badge ${statusBadgeClass}">● ${t.status}</span>
+              </div>
+              <div style="font-size:13px;font-weight:700;color:var(--transporter-text);">${t.crop}</div>
+              <div style="font-size:12px;color:var(--transporter-muted);margin:2px 0 8px;">${t.route}</div>
+              <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px dashed var(--transporter-border-subtle);padding-top:8px;">
+                <div>
+                  <div style="font-size:10.5px;color:var(--transporter-subtle);">Net Payout</div>
+                  <div style="font-size:16px;font-weight:800;color:var(--transporter-primary);">₹${t.net.toLocaleString()}</div>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="showToast('GST Invoice ${t.id} downloaded.', 'success')"><i data-lucide="download"></i> Receipt</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function initCharts() {
+      // 1. Revenue Trend Bar
+      const revCtx = document.getElementById('revenueTrendChart')?.getContext('2d');
+      if (revCtx) {
+        new Chart(revCtx, {
+          type: 'bar',
+          data: {
+            labels: ['Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+            datasets: [{
+              label: 'Gross Freight Turnover (₹ Lakhs)',
+              data: [3.80, 4.10, 4.45, 4.20, 4.60, 4.82],
+              backgroundColor: '#0D4435',
+              borderRadius: 6,
+              hoverBackgroundColor: '#C8963E'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+      }
+
+      // 2. Cost Breakdown Doughnut
+      const costCtx = document.getElementById('costBreakdownChart')?.getContext('2d');
+      if (costCtx) {
+        new Chart(costCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Net Transporter Margin', 'Diesel Fuel Costs', 'FASTag Tolls', 'Driver Allowances & Maintenance'],
+            datasets: [{
+              data: [38.5, 36.0, 12.5, 13.0],
+              backgroundColor: ['#0D4435', '#C8963E', '#0284C7', '#8FCB9B'],
+              borderWidth: 2,
+              borderColor: '#FFFFFF'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } }
+            }
+          }
+        });
+      }
+    }
+  </script>
+</body>
+</html>

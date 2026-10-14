@@ -1,0 +1,2295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — KhetSetu</title>
+  <meta name="description"
+    content="KhetSetu Farmer Dashboard — Track market prices, manage crop lots, view AI forecasts, and sell to verified buyers.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400;1,600&display=swap"
+    rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/mandi-map.css">
+  <!-- Krishi Sahayak AI Market Assistant -->
+  <link rel="stylesheet" href="css/krishi-sahayak.css">
+
+  <!-- Leaflet Map (Free, Zero Token Required) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Leaflet MarkerCluster -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+
+<body class="dashboard-body dashboard-home" data-require-role="farmer">
+
+  <!-- AMBIENT FARMER SUNLIGHT BACKGROUND -->
+  <div class="dash-ambient-bg" aria-hidden="true">
+    <div class="dash-ambient-bg__img"></div>
+    <div class="dash-ambient-bg__overlay"></div>
+    <div class="dash-ambient-bg__sunlight-glow"></div>
+    <div class="dash-ambient-bg__particles"></div>
+  </div>
+
+  <!-- HEADER / NAVBAR -->
+  <header class="dash-header" id="dash-header">
+    <div class="dash-header__inner">
+      <!-- Brand Logo -->
+      <a href="index.html" class="dash-header__logo" id="dash-logo">
+        <span class="dash-header__logo-icon"><i data-lucide="sprout"></i></span>
+        <span class="dash-header__logo-text">KhetSetu</span>
+        <span class="dash-header__role-badge">FARMER</span>
+      </a>
+
+      <!-- Global Search -->
+      <div class="dash-search" id="dash-search">
+        <i data-lucide="search" class="dash-search__icon"></i>
+        <input type="text" id="dash-search-input" class="dash-search__input"
+          placeholder="Search crops, markets, buyers..." autocomplete="off" aria-label="Global search"
+          data-i18n-placeholder="common.searchPlaceholder">
+        <kbd class="dash-search__kbd">Ctrl K</kbd>
+        <div class="dash-search__results" id="dash-search-results"></div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="dash-header__nav" id="dash-nav">
+        <a href="dashboard.html" class="dash-header__link dash-header__link--active" id="nav-dashboard">
+          <i data-lucide="layout-dashboard" class="dash-header__link-icon"></i> <span
+            data-i18n="navigation.dashboard">Dashboard</span>
+        </a>
+        <a href="lots.html" class="dash-header__link" id="nav-lots">
+          <i data-lucide="package" class="dash-header__link-icon"></i> <span data-i18n="navigation.myLots">My
+            Lots</span>
+        </a>
+        <a href="buyers.html" class="dash-header__link" id="nav-inquiries">
+          <i data-lucide="message-square" class="dash-header__link-icon"></i> <span
+            data-i18n="navigation.buyerInquiries">Buyer Inquiries</span>
+        </a>
+        <a href="storage.html" class="dash-header__link" id="nav-storage">
+          <i data-lucide="warehouse" class="dash-header__link-icon"></i> <span data-i18n="navigation.storage">Storage
+            Options</span>
+        </a>
+        <a href="market.html" class="dash-header__link" id="nav-market">
+          <i data-lucide="store" class="dash-header__link-icon"></i> <span
+            data-i18n="navigation.market">Market Prices</span>
+        </a>
+        <a href="ai-forecast.html" class="dash-header__link" id="nav-forecast">
+          <i data-lucide="brain" class="dash-header__link-icon"></i> <span data-i18n="navigation.aiForecast">AI Price
+            Forecast</span>
+        </a>
+        <a href="orders.html" class="dash-header__link" id="nav-orders">
+          <i data-lucide="clipboard-list" class="dash-header__link-icon"></i> <span
+            data-i18n="navigation.orders">Orders</span>
+        </a>
+      </nav>
+
+      <!-- Right Actions -->
+      <div class="dash-header__actions">
+        <button class="dash-header__action-btn" id="btn-notifications" aria-label="Notifications" title="Notifications">
+          <i data-lucide="bell"></i>
+          <span class="dash-header__badge" id="notifications-badge">3</span>
+        </button>
+        <button class="dash-header__action-btn" id="btn-help" aria-label="Help" title="Kisan Support & Help">
+          <i data-lucide="help-circle"></i>
+        </button>
+        <!-- Profile -->
+        <div class="dash-profile-wrap" id="dash-profile-wrap">
+          <button class="dash-header__profile" id="btn-profile" aria-label="Profile menu">
+            <div class="dash-header__avatar" id="header-avatar">R</div>
+            <span class="dash-header__profile-name" id="header-user-name">Rajesh</span>
+            <i data-lucide="chevron-down" class="dash-header__profile-chevron"></i>
+          </button>
+          <div class="dash-profile-dropdown" id="dash-profile-dropdown">
+            <div class="dash-profile-dropdown__header">
+              <div class="dash-header__avatar dash-header__avatar--lg" id="dropdown-avatar">R</div>
+              <div>
+                <div class="dash-profile-dropdown__name" id="dropdown-user-name">Rajesh Patil</div>
+                <div class="dash-profile-dropdown__phone" id="dropdown-user-phone">+91 98765 43210</div>
+              </div>
+            </div>
+            <div class="dash-profile-dropdown__sep"></div>
+            <a href="#" class="dash-profile-dropdown__item" id="menu-profile"><i data-lucide="user"></i> My Profile &
+              Farm</a>
+            <a href="lots.html" class="dash-profile-dropdown__item" id="menu-lots"><i data-lucide="package"></i> Manage
+              My Lots</a>
+            <a href="disputes.html" class="dash-profile-dropdown__item" id="menu-disputes"><i
+                data-lucide="shield-alert"></i> <span data-i18n="navigation.disputes">Trade Disputes</span></a>
+            <a href="#" class="dash-profile-dropdown__item" id="menu-alerts"><i data-lucide="bell-ring"></i> Price
+              Alerts</a>
+            <a href="#" class="dash-profile-dropdown__item" id="menu-help"><i data-lucide="phone-call"></i> Kisan
+              Helpline</a>
+            <div class="dash-profile-dropdown__sep"></div>
+            <a href="index.html" class="dash-profile-dropdown__item dash-profile-dropdown__item--danger"><i
+                data-lucide="log-out"></i> Logout</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Toggle -->
+      <button class="dash-header__toggle" id="dash-nav-toggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Slide Nav -->
+  <div class="dash-mobile-nav" id="dash-mobile-nav">
+    <div class="dash-mobile-nav__links">
+      <a href="dashboard.html" class="dash-mobile-nav__link dash-mobile-nav__link--active" id="mnav-dashboard"><i
+          data-lucide="layout-dashboard"></i> <span data-i18n="navigation.dashboard">Dashboard</span></a>
+      <a href="lots.html" class="dash-mobile-nav__link" id="mnav-lots"><i data-lucide="package"></i> <span
+          data-i18n="navigation.myLots">My Lots</span></a>
+      <a href="buyers.html" class="dash-mobile-nav__link" id="mnav-inquiries"><i data-lucide="message-square"></i> <span
+          data-i18n="navigation.buyerInquiries">Buyer Inquiries</span></a>
+      <a href="storage.html" class="dash-mobile-nav__link" id="mnav-storage"><i data-lucide="warehouse"></i> <span
+          data-i18n="navigation.storage">Storage Options</span></a>
+      <a href="market.html" class="dash-mobile-nav__link" id="mnav-market"><i data-lucide="bar-chart-3"></i> <span
+          data-i18n="navigation.market">Market Prices</span></a>
+      <a href="ai-forecast.html" class="dash-mobile-nav__link" id="mnav-forecast"><i data-lucide="brain"></i> <span
+          data-i18n="navigation.aiForecast">AI Forecast</span></a>
+      <a href="orders.html" class="dash-mobile-nav__link" id="mnav-orders"><i data-lucide="clipboard-list"></i> <span
+          data-i18n="navigation.orders">Orders</span></a>
+      <a href="disputes.html" class="dash-mobile-nav__link" id="mnav-disputes"><i data-lucide="shield-alert"></i> <span
+          data-i18n="navigation.disputes">Trade Disputes</span></a>
+      <a href="#" class="dash-mobile-nav__link" id="mobile-nav-profile"><i data-lucide="user"></i> <span
+          data-i18n="farmer.farmProfile">Profile Settings</span></a>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="dash-main" id="dash-main">
+
+    <!-- ── 1. WELCOME / HERO ── -->
+    <section class="dash-welcome" id="dash-welcome">
+      <div class="dash-welcome__bg">
+        <img src="assets/images/farmer-sunlight-bg.jpg"
+          alt="Indian farmer in lush green fields at sunrise with warm sunlight" id="dash-welcome-bg">
+        <div class="dash-welcome__overlay"></div>
+      </div>
+      <div class="dash-welcome__content container">
+        <div class="dash-welcome__text">
+          <p class="dash-welcome__greeting" id="dash-greeting">Good Morning 👋</p>
+          <h1 class="dash-welcome__headline" id="dash-headline" data-i18n="farmer.makeSmarterDecisions">Make smarter
+            selling decisions with
+            <em>KhetSetu.</em>
+          </h1>
+          <p class="dash-welcome__sub" id="dash-sub" data-i18n="farmer.dashboardSubtitle">Track live mandi prices, get
+            AI forecasts, and sell directly to
+            verified institutional buyers.</p>
+          <div class="dash-welcome__ctas">
+            <button class="btn btn--primary dash-welcome__btn" id="btn-sell-crop"
+              onclick="FarmerFlow.openCreateLotModal()"><i data-lucide="plus-circle"></i> <span
+                data-i18n="farmer.sellYourCrop">+ Sell Your Crop</span></button>
+            <a href="market.html" class="btn btn--secondary dash-welcome__btn" id="btn-view-prices"><i
+                data-lucide="trending-up"></i> <span data-i18n="farmer.viewMarketPrices">View Market Prices →</span></a>
+          </div>
+        </div>
+        <div class="dash-welcome__meta">
+          <span class="dash-welcome__meta-item" id="dash-location"><i data-lucide="map-pin"></i> Maharashtra (Pune
+            APMC)</span>
+          <span class="dash-welcome__meta-item" id="dash-weather"><i data-lucide="cloud-sun"></i> 29°C · Clear
+            Sky</span>
+          <span class="dash-welcome__meta-item" id="dash-date-display"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 1.2 DAILY KISAN AI ADVICE (Decision Support) ── -->
+    <section class="dash-section" style="padding-top: 14px; padding-bottom: 0;" id="section-daily-tip">
+      <div class="container">
+        <div class="dash-ai-advice-card" id="kisan-daily-tip-banner">
+          <div class="dash-ai-advice-header">
+            <div class="dash-ai-advice-tag-row">
+              <span class="dash-ai-advice-badge" id="kisan-tip-badge">
+                <span class="dash-ai-badge-icon">🌾</span> Daily AI Advice
+              </span>
+              <span class="dash-ai-advice-live" id="kisan-tip-date">
+                <span class="dash-ai-live-dot"></span> LIVE AI
+              </span>
+              <span class="dash-ai-advice-update">• Updated today for Western Maharashtra</span>
+            </div>
+            <div class="dash-ai-advice-actions">
+              <button class="dash-ai-voice-btn" id="btn-speak-tip" onclick="speakCurrentTip()"
+                aria-label="Listen to advice">
+                <span id="voice-icon">🔊</span> <span id="voice-btn-text">Listen</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="dash-ai-advice-body">
+            <h2 class="dash-ai-advice-headline" id="kisan-tip-text">
+              Your tomato harvest is approaching dispatch readiness. Mandi prices are showing a positive trend across
+              nearby hubs.
+            </h2>
+          </div>
+
+          <!-- Structured Decision Support: Market vs Recommendation -->
+          <div class="dash-ai-decision-row">
+            <div class="dash-ai-decision-box dash-ai-decision-box--market">
+              <div class="dash-ai-decision-label">
+                <i data-lucide="trending-up" style="width: 14px; height: 14px;"></i> MARKET
+              </div>
+              <div class="dash-ai-decision-desc">
+                Mandi prices are showing an upward trend (+4.2%). Regional arrivals are tapering off by 18%, offering a
+                +₹70 to +₹120/q premium for Grade A lots.
+              </div>
+            </div>
+
+            <div class="dash-ai-decision-box dash-ai-decision-box--rec">
+              <div class="dash-ai-decision-label">
+                <i data-lucide="lightbulb" style="width: 14px; height: 14px;"></i> RECOMMENDATION
+              </div>
+              <div class="dash-ai-decision-desc" id="kisan-rec-desc">
+                Consider checking nearby buyer offers before dispatching, or hold in accredited warehouse facilities to avoid mandi gluts.
+              </div>
+            </div>
+          </div>
+
+          <div class="dash-ai-advice-footer">
+            <div class="dash-ai-footer-btns">
+              <a href="ai-forecast.html" class="btn btn--sm dash-ai-btn-view" id="btn-view-ai-advice">
+                <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i> View AI Advice
+              </a>
+              <a href="storage.html#tab-panel-calculator" class="dash-ai-action-link">
+                Compare Sell vs. Store <i data-lucide="arrow-right" style="width: 13px; height: 13px;"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 1.3 4 LARGE KISAN ACTION CARDS (3-TAP RULE) ── -->
+    <section class="dash-section" style="padding-top: 0; padding-bottom: 8px;" id="section-kisan-actions">
+      <div class="container">
+        <div class="kisan-action-grid">
+          <!-- Card 1: Today's Mandi Price -->
+          <div class="kisan-action-card kisan-action-card--price" onclick="location.href='market.html'" role="button"
+            tabindex="0">
+            <div class="kisan-action-card__top">
+              <div class="kisan-action-card__icon">💰</div>
+              <div class="kisan-action-card__info">
+                <h3 class="kisan-action-card__title" id="lbl-action-card1-title">
+                  <span data-i18n="farmer.todayMandiPrices">Today's Mandi Prices</span>
+                  <span class="kisan-action-card__badge kisan-action-card__badge--price">Live APMC</span>
+                </h3>
+                <p class="kisan-action-card__subtitle" id="lbl-action-card1-desc" data-i18n="farmer.todayMandiDesc">
+                  Check live mandi prices, daily commodity arrivals, and price trends across major APMCs.
+                </p>
+              </div>
+            </div>
+            <div class="kisan-action-card__footer">
+              <span class="kisan-action-card__stat" id="lbl-action-card1-stat"><span
+                  data-i18n="farmer.bestPriceLabel">Best Price</span>: <strong
+                  id="lbl-best-mandi-price-val">Loading...</strong></span>
+              <button class="kisan-action-card__btn" type="button">
+                <span id="btn-text-card1" data-i18n="farmer.viewMarketPrices">View Prices</span> <i
+                  data-lucide="arrow-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 2: Sell My Crop -->
+          <div class="kisan-action-card kisan-action-card--sell" onclick="FarmerFlow.openCreateLotModal()" role="button"
+            tabindex="0">
+            <div class="kisan-action-card__top">
+              <div class="kisan-action-card__icon">🌾</div>
+              <div class="kisan-action-card__info">
+                <h3 class="kisan-action-card__title" id="lbl-action-card2-title">
+                  <span data-i18n="farmer.listCropForSale">List Crop for Sale</span>
+                  <span class="kisan-action-card__badge kisan-action-card__badge--sell" data-i18n="farmer.newLotBadge">+
+                    New Lot</span>
+                </h3>
+                <p class="kisan-action-card__subtitle" id="lbl-action-card2-desc" data-i18n="farmer.listCropDesc">
+                  List your harvested produce and receive direct, verified offers from corporate buyers.
+                </p>
+              </div>
+            </div>
+            <div class="kisan-action-card__footer">
+              <span class="kisan-action-card__stat" id="lbl-action-card2-stat"><span data-i18n="farmer.myCropsLabel">My
+                  Crops</span>: <strong id="kisan-active-lots-count">3 Lots</strong></span>
+              <button class="kisan-action-card__btn" type="button">
+                <span id="btn-text-card2" data-i18n="farmer.listCropForSale">List Crop</span> <i data-lucide="plus"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 3: Find Godowns & Compare -->
+          <div class="kisan-action-card kisan-action-card--storage" onclick="location.href='storage.html'" role="button"
+            tabindex="0">
+            <div class="kisan-action-card__top">
+              <div class="kisan-action-card__icon">🏬</div>
+              <div class="kisan-action-card__info">
+                <h3 class="kisan-action-card__title" id="lbl-action-card3-title">
+                  <span data-i18n="farmer.findGodowns">Find & Compare Warehouses</span>
+                  <span class="kisan-action-card__badge kisan-action-card__badge--storage"
+                    data-i18n="farmer.nearbyBadge">Nearby</span>
+                </h3>
+                <p class="kisan-action-card__subtitle" id="lbl-action-card3-desc" data-i18n="farmer.findGodownsDesc">
+                  Locate WDRA/MSWC accredited warehouses, compare monthly tariffs, and book space.
+                </p>
+              </div>
+            </div>
+            <div class="kisan-action-card__footer">
+              <span class="kisan-action-card__stat" id="lbl-action-card3-stat">Nearest: <strong
+                  id="kisan-nearest-warehouse-val">8.5 km (₹38/bag)</strong></span>
+              <button class="kisan-action-card__btn" type="button">
+                <span id="btn-text-card3" data-i18n="farmer.findGodowns">Find Godowns</span> <i
+                  data-lucide="warehouse"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 4: Sell Now or Store? -->
+          <div class="kisan-action-card kisan-action-card--decision"
+            onclick="location.href='storage.html#tab-panel-calculator'" role="button" tabindex="0">
+            <div class="kisan-action-card__top">
+              <div class="kisan-action-card__icon">🤖</div>
+              <div class="kisan-action-card__info">
+                <h3 class="kisan-action-card__title" id="lbl-action-card4-title">
+                  <span data-i18n="farmer.sellNowVsStore">Sell Now vs. Store & Hold</span>
+                  <span class="kisan-action-card__badge kisan-action-card__badge--decision"
+                    data-i18n="farmer.aiAdvisorBadge">AI Advisor</span>
+                </h3>
+                <p class="kisan-action-card__subtitle" id="lbl-action-card4-desc" data-i18n="farmer.sellNowVsStoreDesc">
+                  Calculate if storing your harvest yields higher profit vs selling immediately at today's mandi price.
+                </p>
+              </div>
+            </div>
+            <div class="kisan-action-card__footer">
+              <span class="kisan-action-card__stat" id="lbl-action-card4-stat"><span
+                  data-i18n="farmer.estimatedGain">Estimated Gain</span>: <strong id="kisan-calc-gain-val"
+                  style="color:#2E7D32;">+₹7,450</strong></span>
+              <button class="kisan-action-card__btn" type="button">
+                <span id="btn-text-card4" data-i18n="farmer.viewAiAdvice">View AI Advice</span> <i
+                  data-lucide="sparkles"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 2. QUICK STATS (Today's Summary) ── -->
+    <section class="dash-stats" id="dash-stats">
+      <div class="container">
+        <div class="dash-stats__grid">
+          <div class="dash-stat" id="stat-active-lots" onclick="location.href='lots.html'" tabindex="0" role="button"
+            aria-label="View Active Lots">
+            <div class="dash-stat__icon dash-stat__icon--green"><i data-lucide="package"></i></div>
+            <div class="dash-stat__body">
+              <div class="dash-stat__label" id="lbl-stat-active-lots" data-i18n="farmer.activeLotsLabel">Active Lots
+              </div>
+              <div class="dash-stat__value" id="stat-lots-val" data-count="3">3</div>
+              <div class="dash-stat__sub" id="stat-lots-sub">2 crops currently listed</div>
+            </div>
+            <div class="dash-stat__trend dash-stat__trend--up"><i data-lucide="arrow-up-right"></i> Live</div>
+          </div>
+          <div class="dash-stat" id="stat-best-price" onclick="location.href='market.html'" tabindex="0" role="button"
+            aria-label="Check Best Market Price">
+            <div class="dash-stat__icon dash-stat__icon--gold"><i data-lucide="trending-up"></i></div>
+            <div class="dash-stat__body">
+              <div class="dash-stat__label" data-i18n="farmer.bestMarketPriceLabel">Best Mandi Price</div>
+              <div class="dash-stat__value" id="stat-best-val">Loading...</div>
+              <div class="dash-stat__sub" id="stat-best-sub">Government APMC Benchmark</div>
+            </div>
+            <div class="dash-stat__trend dash-stat__trend--up"><i data-lucide="arrow-up-right"></i> 6.1%</div>
+          </div>
+          <div class="dash-stat" id="stat-buyer-offers" onclick="location.href='buyers.html'" tabindex="0" role="button"
+            aria-label="View Buyer Offers">
+            <div class="dash-stat__icon dash-stat__icon--blue"><i data-lucide="handshake"></i></div>
+            <div class="dash-stat__body">
+              <div class="dash-stat__label" id="lbl-stat-buyer-offers" data-i18n="farmer.buyerOffersLabel">Buyer Offers
+              </div>
+              <div class="dash-stat__value" id="stat-offers-val" data-count="4">4</div>
+              <div class="dash-stat__sub">₹2,17,700 total offered</div>
+            </div>
+            <div class="dash-stat__trend dash-stat__trend--up"><i data-lucide="arrow-up-right"></i> Active</div>
+          </div>
+          <div class="dash-stat" id="stat-pending-orders" onclick="location.href='orders.html'" tabindex="0"
+            role="button" aria-label="Track Pending Orders">
+            <div class="dash-stat__icon dash-stat__icon--orange"><i data-lucide="clock"></i></div>
+            <div class="dash-stat__body">
+              <div class="dash-stat__label" data-i18n="farmer.pendingOrdersLabel">Order & Payment Status</div>
+              <div class="dash-stat__value" id="stat-orders-val" data-count="3">3</div>
+              <div class="dash-stat__sub">₹31,000 pending settlement</div>
+            </div>
+            <div class="dash-stat__trend dash-stat__trend--neutral"><i data-lucide="arrow-right"></i> View Payment</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="home-command" id="home-command" aria-labelledby="home-command-title">
+      <div class="container">
+        <div class="home-command__heading">
+          <div>
+            <p class="home-command__eyebrow" data-i18n="farmer.commandCenterEyebrow">YOUR FARM, AT A GLANCE</p>
+            <h2 id="home-command-title" data-i18n="farmer.commandCenterTitle">Farm command center</h2>
+          </div>
+          <a href="lots.html" class="home-command__all-link">
+            <span data-i18n="farmer.viewAllLots">View all lots</span>
+            <i data-lucide="arrow-up-right" aria-hidden="true"></i>
+          </a>
+        </div>
+
+        <div class="home-command__grid">
+          <article class="home-widget home-widget--market">
+            <div class="home-widget__header">
+              <div class="home-widget__title-wrap">
+                <span class="home-widget__icon"><i data-lucide="bar-chart-3"></i></span>
+                <div>
+                  <h3 data-i18n="farmer.marketWatchTitle">Market watch</h3>
+                  <p data-i18n="farmer.marketWatchSubtitle">Latest reported mandi prices</p>
+                </div>
+              </div>
+              <a href="market.html" class="home-widget__more" aria-label="Open market prices">
+                <i data-lucide="arrow-up-right"></i>
+              </a>
+            </div>
+            <div class="home-market-list" id="home-market-watch" aria-live="polite">
+              <p class="home-widget__empty" data-i18n="farmer.marketWatchLoading">Loading market prices…</p>
+            </div>
+            <p class="home-widget__footnote" data-i18n="farmer.marketWatchFootnote">Prices depend on the latest government market report.</p>
+          </article>
+
+          <article class="home-widget home-widget--portfolio">
+            <div class="home-widget__header">
+              <div class="home-widget__title-wrap">
+                <span class="home-widget__icon home-widget__icon--mint"><i data-lucide="wheat"></i></span>
+                <div>
+                  <h3 data-i18n="farmer.portfolioTitle">Crop portfolio</h3>
+                  <p data-i18n="farmer.portfolioSubtitle">Your listed produce</p>
+                </div>
+              </div>
+            </div>
+            <div class="home-portfolio__summary">
+              <div><span data-i18n="farmer.activeListings">Active listings</span><strong id="home-portfolio-count">—</strong></div>
+              <div><span data-i18n="farmer.quantityListed">Quantity listed</span><strong id="home-portfolio-quantity">—</strong></div>
+            </div>
+            <div class="home-portfolio__items" id="home-portfolio-items"></div>
+            <a href="lots.html" class="home-widget__text-link">
+              <span data-i18n="farmer.managePortfolio">Manage your crop lots</span><i data-lucide="arrow-right"></i>
+            </a>
+          </article>
+
+          <article class="home-widget home-widget--queue">
+            <div class="home-widget__header">
+              <div class="home-widget__title-wrap">
+                <span class="home-widget__icon home-widget__icon--amber"><i data-lucide="list-checks"></i></span>
+                <div>
+                  <h3 data-i18n="farmer.actionQueueTitle">Action queue</h3>
+                  <p data-i18n="farmer.actionQueueSubtitle">Items that may need your attention</p>
+                </div>
+              </div>
+            </div>
+            <div class="home-queue-list" id="home-action-queue"></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 3. SMART SELLING OPPORTUNITY (Produce & Market Opportunity) ── -->
+    <section class="dash-section dash-section--opportunity" id="dash-opportunity">
+      <div class="container">
+        <div class="dash-opp-card" id="opp-card">
+          <div class="dash-opp-card__badge-row">
+            <span class="dash-opp-pill"><i data-lucide="sparkles"></i> <span data-i18n="farmer.topBuyingOpportunity">Top
+                Buying Opportunity</span></span>
+            <span class="dash-opp-verified"><i data-lucide="shield-check"></i> <span
+                data-i18n="farmer.verifiedBuyerTag">Verified Institutional Buyer · Shah Agro Trading</span></span>
+          </div>
+          <div class="dash-opp-card__main">
+            <div class="dash-opp-card__icon" aria-hidden="true">🍅</div>
+            <div class="dash-opp-card__content">
+              <div class="dash-opp-card__crop-row">
+                <h3 class="dash-opp-card__title"><span data-i18n="crops.tomato">Tomato</span> <span
+                    class="dash-opp-card__qty-pill">850 kg · Grade A</span></h3>
+                <span class="dash-opp-rec-chip" data-i18n="farmer.recommendationFpoConsolidation">⚡ SELL TO FPO
+                  CONSOLIDATION · 92% CONFIDENCE</span>
+              </div>
+              <p class="dash-opp-card__desc" data-i18n="farmer.oppDesc">Your tomato harvest is approaching dispatch
+                readiness. Verified Vashi buyer demand is matched and ready for FPO consolidation:</p>
+
+              <div class="dash-opp-card__metrics">
+                <div class="dash-opp-metric">
+                  <span class="dash-opp-metric__lbl" data-i18n="farmer.currentMandiRate">Current Mandi Rate</span>
+                  <strong class="dash-opp-metric__val" id="opp-cur-price">₹2,850 <small>/q</small></strong>
+                  <span class="dash-opp-metric__sub" data-i18n="farmer.vashiBenchmark">Vashi APMC Benchmark</span>
+                </div>
+                <div class="dash-opp-metric-divider" aria-hidden="true">
+                  <i data-lucide="arrow-right"></i>
+                </div>
+                <div class="dash-opp-metric dash-opp-metric--featured">
+                  <span class="dash-opp-metric__lbl" data-i18n="farmer.bestBuyerOffer">Best Buyer Offer</span>
+                  <strong class="dash-opp-metric__val dash-opp-metric__val--green" id="opp-rec-price">₹2,920
+                    <small>/q</small></strong>
+                  <span class="dash-opp-metric__premium" data-i18n="farmer.marketLinked">+₹70/q market-linked</span>
+                </div>
+                <div class="dash-opp-metric-divider" aria-hidden="true">
+                  <span>=</span>
+                </div>
+                <div class="dash-opp-metric dash-opp-metric--total">
+                  <span class="dash-opp-metric__lbl" data-i18n="farmer.totalRealization">Total Potential
+                    Realization</span>
+                  <strong class="dash-opp-metric__val dash-opp-metric__val--total" id="opp-total-val">₹24,820</strong>
+                  <span class="dash-opp-card__extra" id="opp-extra-val" style="display:none;">850 kg · ₹24,820</span>
+                  <span class="dash-opp-metric__sub" data-i18n="farmer.fullLotPayout">Full 850 kg lot payout</span>
+                </div>
+              </div>
+
+              <div class="dash-opp-factors">
+                <span class="dash-opp-factor-item">📊 High institutional demand</span>
+                <span class="dash-opp-factor-item">⏱️ Peak price window in 48h</span>
+                <span class="dash-opp-factor-item">🛡️ Guaranteed escrow settlement</span>
+              </div>
+            </div>
+
+            <div class="dash-opp-card__action">
+              <button type="button" class="btn btn--primary dash-opp-btn" id="btn-send-fpo" onclick="handleSendToFpo()">
+                <span data-i18n="farmer.sendToFpo">Send to FPO</span>
+                <span class="btn-arrow">→</span>
+              </button>
+              <span class="dash-opp-action-hint" id="send-fpo-status-hint"
+                data-i18n="farmer.directFpoConsolidation">Direct FPO consolidation</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 3.5 STORAGE & SELLING DECISION (DISTRESS SELLING PREVENTION) ── -->
+    <section class="dash-section" style="padding-top:0; padding-bottom:12px;" id="dash-storage-decision">
+      <div class="container">
+        <div class="dash-card"
+          style="background:#FFFFFF; border:2px solid #D8C28A; border-radius:16px; padding:20px 24px; box-shadow:0 4px 18px rgba(201,151,59,0.09);">
+          <div
+            style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:22px;">🏬</span>
+              <div>
+                <h3 style="font-size:16.5px; font-weight:800; color:var(--ks-evergreen); margin:0;">Storage & Selling
+                  Decision Support</h3>
+                <span style="font-size:12px; color:#666;">AI comparison: Sell at current mandi rate vs. Store in nearby
+                  accredited warehouse</span>
+              </div>
+              <p style="font-size: 13px; color: var(--ks-text-muted); margin: 2px 0 0 0;">
+                Hold your harvest safely when mandi prices are low and sell when rates rebound.
+              </p>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <a href="storage.html#tab-panel-calculator" class="btn btn--outline btn--sm"
+                style="font-size:12px; font-weight:700;">
+                <i data-lucide="calculator"></i> Compare Sell vs. Store
+              </a>
+              <button class="btn btn--secondary btn--sm" onclick="openStorageModal()">
+                <i data-lucide="search"></i> View All Warehouses
+              </button>
+            </div>
+          </div>
+
+          <!-- Truthful Storage Status & Region Bar -->
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; background:#FAF9F5; padding:10px 14px; border-radius:10px; border:1px solid #E5E4DD;">
+            <div id="dash-storage-status-indicator" style="display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700;">
+              <span class="dash-status-dot" style="width:9px; height:9px; border-radius:50%; background:#2D6A4F; display:inline-block;"></span>
+              <span id="dash-storage-status-text">Loading government storage data…</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; font-size:12px; flex-wrap:wrap;">
+              <span style="color:#666;" id="dash-storage-updated-text">Source: Government of India • IISFM</span>
+              <button class="btn btn--secondary btn--sm" id="dash-storage-loc-btn" onclick="requestDashboardFarmerLocation()" style="font-size:11.5px; padding:3px 10px; height:30px; display:inline-flex; align-items:center; gap:4px;">
+                <i data-lucide="crosshair"></i> <span>Detect My Location</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="storage-grid" id="storage-quick-grid">
+            <!-- Dynamically populated from live Government IISFM depots or demo fallback by dashboard.js -->
+            <div style="grid-column:1/-1; text-align:center; padding:30px; color:#666;">
+              <div class="dash-spinner" style="margin:0 auto 10px; width:26px; height:26px; border:3px solid #DDD; border-top-color:var(--ks-evergreen); border-radius:50%; animation:spin 0.8s linear infinite;"></div>
+              Loading nearby storage depots & capacity...
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 4. SELLING JOURNEY ROADMAP (Orders & Active Activity) ── -->
+    <section class="dash-section dash-section--journey" id="dash-selling-journey">
+      <div class="container">
+        <div class="dash-journey-card">
+          <div class="dash-journey-header">
+            <div class="dash-journey-header__title">
+              <span class="dash-journey-header__icon">🌾</span>
+              <h3>Your Farm Selling Journey</h3>
+              <span class="dash-journey-header__badge" id="demo-pipeline-badge">Active Pipeline</span>
+            </div>
+            <span class="dash-journey-header__sub">6 stages from Ramesh Patil's tomato harvest to verified bank
+              payout</span>
+          </div>
+          <div class="dash-journey-grid">
+            <div class="dash-journey-step dash-journey-step--completed" onclick="FarmerFlow.openFarmProfileModal()"
+              role="button" tabindex="0" title="Farm Profile">
+              <div class="dash-journey-step__header">
+                <span class="dash-journey-step__num">STAGE 1</span>
+                <span class="dash-journey-step__status">✓ Done</span>
+              </div>
+              <div class="dash-journey-step__name">Farm Profile</div>
+              <div class="dash-journey-step__hint">Ramesh Patil verified</div>
+            </div>
+            <div class="dash-journey-step dash-journey-step--completed" onclick="FarmerFlow.openCreateLotModal()"
+              role="button" tabindex="0" title="List Produce Lot">
+              <div class="dash-journey-step__header">
+                <span class="dash-journey-step__num">STAGE 2</span>
+                <span class="dash-journey-step__status">✓ Listed</span>
+              </div>
+              <div class="dash-journey-step__name">List Produce</div>
+              <div class="dash-journey-step__hint">Tomato 850 kg (Grade A)</div>
+            </div>
+            <div class="dash-journey-step dash-journey-step--completed" id="journey-step-fpo"
+              onclick="location.href='fpo-dashboard.html'" role="button" tabindex="0" title="FPO Consolidation">
+              <div class="dash-journey-step__header">
+                <span class="dash-journey-step__num">STAGE 3</span>
+                <span class="dash-journey-step__status" id="journey-status-fpo">✓ Consolidated</span>
+              </div>
+              <div class="dash-journey-step__name">FPO Hub</div>
+              <div class="dash-journey-step__hint" id="journey-hint-fpo">Suresh Jadhav verified</div>
+            </div>
+            <div class="dash-journey-step dash-journey-step--completed" id="journey-step-buyer"
+              onclick="location.href='buyer.html'" role="button" tabindex="0" title="Buyer Matching">
+              <div class="dash-journey-step__header">
+                <span class="dash-journey-step__num">STAGE 4</span>
+                <span class="dash-journey-step__status">✓ Matched</span>
+              </div>
+              <div class="dash-journey-step__name">Buyer Match</div>
+              <div class="dash-journey-step__hint">Amit Shah (Vashi APMC)</div>
+            </div>
+            <div class="dash-journey-step dash-journey-step--completed" id="journey-step-trans"
+              onclick="location.href='transporter/dashboard.html'" role="button" tabindex="0"
+              title="Transport & Logistics">
+              <div class="dash-journey-step__header">
+                <span class="dash-journey-step__num">STAGE 5</span>
+                <span class="dash-journey-step__status">✓ In Transit</span>
+              </div>
+              <div class="dash-journey-step__name">Transport</div>
+              <div class="dash-journey-step__hint">Vijay More (MH-43)</div>
+            </div>
+            <div class="dash-journey-step dash-journey-step--active" id="journey-step-complete" role="button"
+              tabindex="0" title="Completion & Escrow">
+              <div class="dash-journey-step__header">
+                <span class="dash-journey-step__num">STAGE 6</span>
+                <span class="dash-journey-step__status">⭐ Completed</span>
+              </div>
+              <div class="dash-journey-step__name">Settlement</div>
+              <div class="dash-journey-step__hint">₹24,820 Bank Payout</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 4.5 END-TO-END DEMO JOURNEY TIMELINE (Farmer → FPO → Market → Buyer → Transport → Completion) ── -->
+    <section class="dash-section" style="padding-top: 0; padding-bottom: 14px;" id="demo-journey-section">
+      <div class="container">
+        <div class="dash-card"
+          style="background: #FFFFFF; border: 1.5px solid #E2E0D5; border-radius: 16px; padding: 22px 26px; box-shadow: 0 4px 16px rgba(0,0,0,0.04);">
+          <div
+            style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; border-bottom: 1px solid #ECEAE1; padding-bottom: 14px;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 20px;">🚛</span>
+                <h3 style="font-size: 17px; font-weight: 800; color: #12372A; margin: 0;">Produce Movement Lifecycle:
+                  Farmer → FPO → Buyer → Delivery</h3>
+                <span
+                  style="font-size: 11.5px; font-weight: 700; background: #E8F5E9; color: #2E7D32; border: 1px solid #C8E6C9; padding: 2px 8px; border-radius: 6px;">Active
+                  Trade Lifecycle</span>
+              </div>
+              <p style="font-size: 13px; color: #6F7F75; margin: 4px 0 0 0;">
+                Traceable end-to-end journey of Ramesh Patil's 850 kg Grade A Tomato lot from harvest to Vashi APMC
+                settlement.
+              </p>
+            </div>
+            <div id="demo-reset-btn-wrap" style="display: none;">
+              <button type="button" class="btn btn--secondary btn--sm"
+                onclick="if(window.KrishiDemo) { window.KrishiDemo.resetDemo(); location.reload(); }"
+                style="font-size: 12px; font-weight: 700; border-color: #D6A84F; color: #92400E; background: #FEF7E6;">
+                <i data-lucide="rotate-ccw"></i> Reset Trade Flow
+              </button>
+            </div>
+          </div>
+
+          <!-- Chronological Communication & Milestone Audit Feed -->
+          <div style="background: #FAF9F5; border: 1px solid #ECEAE1; border-radius: 12px; padding: 16px 20px;">
+            <div
+              style="font-size: 12.5px; font-weight: 800; color: #12372A; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.04em;">
+              Platform Communication & Milestone Audit Trail
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px;" id="demo-audit-trail">
+              <div style="display: flex; align-items: flex-start; gap: 12px; font-size: 13px;">
+                <span style="font-size: 11.5px; font-weight: 700; color: #6F7F75; min-width: 65px;">08:15 AM</span>
+                <span
+                  style="width: 8px; height: 8px; border-radius: 50%; background: #2E7D32; margin-top: 6px; flex-shrink: 0;"></span>
+                <div style="flex: 1;">
+                  <strong style="color: #12372A;">Ramesh Patil (Farmer):</strong> "Tomato harvest is ready for dispatch.
+                  Approximately 850 kg available."
+                </div>
+              </div>
+              <div style="display: flex; align-items: flex-start; gap: 12px; font-size: 13px;">
+                <span style="font-size: 11.5px; font-weight: 700; color: #6F7F75; min-width: 65px;">09:05 AM</span>
+                <span
+                  style="width: 8px; height: 8px; border-radius: 50%; background: #1565C0; margin-top: 6px; flex-shrink: 0;"></span>
+                <div style="flex: 1;">
+                  <strong style="color: #12372A;">Suresh Jadhav (FPO):</strong> "Received, Ramesh. We have consolidated
+                  your lot with today's Vashi requirement."
+                </div>
+              </div>
+              <div style="display: flex; align-items: flex-start; gap: 12px; font-size: 13px;">
+                <span style="font-size: 11.5px; font-weight: 700; color: #6F7F75; min-width: 65px;">09:30 AM</span>
+                <span
+                  style="width: 8px; height: 8px; border-radius: 50%; background: #7B1FA2; margin-top: 6px; flex-shrink: 0;"></span>
+                <div style="flex: 1;">
+                  <strong style="color: #12372A;">Match Engine:</strong> Buyer demand matched with Shah Agro Trading Co.
+                  (800–1,000 kg Grade A Tomato requirement at Vashi APMC).
+                </div>
+              </div>
+              <div style="display: flex; align-items: flex-start; gap: 12px; font-size: 13px;">
+                <span style="font-size: 11.5px; font-weight: 700; color: #6F7F75; min-width: 65px;">10:10 AM</span>
+                <span
+                  style="width: 8px; height: 8px; border-radius: 50%; background: #D6A84F; margin-top: 6px; flex-shrink: 0;"></span>
+                <div style="flex: 1;">
+                  <strong style="color: #12372A;">Amit Shah (Buyer):</strong> "I can accept the Grade A tomato lot at
+                  the agreed Vashi market-linked price."
+                </div>
+              </div>
+              <div style="display: flex; align-items: flex-start; gap: 12px; font-size: 13px;">
+                <span style="font-size: 11.5px; font-weight: 700; color: #6F7F75; min-width: 65px;">11:00 AM</span>
+                <span
+                  style="width: 8px; height: 8px; border-radius: 50%; background: #E65100; margin-top: 6px; flex-shrink: 0;"></span>
+                <div style="flex: 1;">
+                  <strong style="color: #12372A;">Vijay More (Transporter):</strong> "Pickup confirmed from the FPO
+                  collection point at 6:30 AM."
+                </div>
+              </div>
+              <div style="display: flex; align-items: flex-start; gap: 12px; font-size: 13px;">
+                <span style="font-size: 11.5px; font-weight: 700; color: #6F7F75; min-width: 65px;">12:45 PM</span>
+                <span
+                  style="width: 8px; height: 8px; border-radius: 50%; background: #2E7D32; margin-top: 6px; flex-shrink: 0;"></span>
+                <div style="flex: 1;">
+                  <strong style="color: #12372A;">Vashi Receiving Dock:</strong> Delivery received, digital weighment
+                  verified (850 kg net), and trade marked Completed.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 5. QUICK ACTIONS ── -->
+    <section class="dash-section dash-actions-section" id="dash-quick-actions">
+      <div class="container">
+        <div class="dash-actions__grid">
+          <button class="dash-action" id="action-sell">
+            <div class="dash-action__icon dash-action__icon--green"><i data-lucide="plus-circle"></i></div><span
+              class="dash-action__label">Sell Crop</span><span class="dash-action__desc">Add new crop lot</span>
+          </button>
+          <button class="dash-action" id="action-prices" onclick="location.href='market.html'">
+            <div class="dash-action__icon dash-action__icon--gold"><i data-lucide="indian-rupee"></i></div><span
+              class="dash-action__label">Market Prices</span><span class="dash-action__desc">15 APMC mandis</span>
+          </button>
+          <button class="dash-action" id="action-buyers" onclick="location.href='buyers.html'">
+            <div class="dash-action__icon dash-action__icon--blue"><i data-lucide="users"></i></div><span
+              class="dash-action__label">Find Buyers</span><span class="dash-action__desc">Verified procurement</span>
+          </button>
+          <button class="dash-action" id="action-forecast" onclick="location.href='ai-forecast.html'">
+            <div class="dash-action__icon dash-action__icon--purple"><i data-lucide="brain"></i></div><span
+              class="dash-action__label">AI Forecast</span><span class="dash-action__desc">Price predictions</span>
+          </button>
+          <button class="dash-action" id="action-alerts" onclick="openAlertModal()">
+            <div class="dash-action__icon dash-action__icon--orange"><i data-lucide="bell-ring"></i></div><span
+              class="dash-action__label">Price Alerts</span><span class="dash-action__desc">SMS & App alerts</span>
+          </button>
+          <button class="dash-action" id="action-lots" onclick="location.href='lots.html'">
+            <div class="dash-action__icon dash-action__icon--teal"><i data-lucide="list-checks"></i></div><span
+              class="dash-action__label">My Lots</span><span class="dash-action__desc">Manage listings</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 6. MARKET INSIGHTS SUMMARY (AI Insights) ── -->
+    <section class="dash-section" id="dash-market-insights">
+      <div class="container">
+        <div class="dash-section__header">
+          <div>
+            <h2 class="dash-section__title" data-i18n="farmer.marketIntelligenceTitle">Market Intelligence & Insights
+            </h2>
+            <p class="dash-section__subtitle" data-i18n="farmer.marketIntelligenceSubtitle">Real-time alerts for better
+              selling decisions</p>
+          </div>
+          <a href="market.html" class="dash-section__action"><span data-i18n="farmer.fullMarketOverview">Full Market
+              Overview</span> <i data-lucide="arrow-right"></i></a>
+        </div>
+        <div class="dash-insights__grid" id="insights-grid">
+          <div class="dash-insight-card"><span class="dash-insight-card__emoji">📈</span>
+            <p>Rice demand is <strong>increasing by 14%</strong> across Maharashtra mandis due to institutional buying.
+            </p>
+          </div>
+          <div class="dash-insight-card"><span class="dash-insight-card__emoji">🔥</span>
+            <p>Onion prices are <strong>rising in Pune & Nashik</strong>. Current price is ₹2,850/q, 12% above seasonal
+              average.</p>
+          </div>
+          <div class="dash-insight-card"><span class="dash-insight-card__emoji">📉</span>
+            <p>Tomato market arrivals are <strong>up by 20%</strong> in Solapur. Recommended to sell fresh harvest
+              within 2 days.</p>
+          </div>
+          <div class="dash-insight-card"><span class="dash-insight-card__emoji">🏆</span>
+            <p><strong>Mumbai APMC</strong> currently offers highest realization on premium grade grains.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 7. MANDI PRICE COMPARISON ENTRY (Secondary Information) ── -->
+    <section class="dash-section" style="padding-top:0; padding-bottom:8px;" id="dash-compare-entry">
+      <div class="container">
+        <div class="mpc-entry-card" onclick="location.href='mandi-compare.html'" role="button" tabindex="0"
+          aria-label="Compare Mandi Prices">
+          <div class="mpc-entry-card__left">
+            <div class="mpc-entry-card__icon-wrap">
+              <i data-lucide="bar-chart-2"></i>
+            </div>
+            <div class="mpc-entry-card__text">
+              <h3 class="mpc-entry-card__title">📊 Compare Mandi Prices</h3>
+              <p class="mpc-entry-card__desc">Find the best price for your crop across 45+ Indian APMCs. Compare
+                earnings, transport costs &amp; get a clear ⭐ recommendation.</p>
+
+              <!-- Farmer Government Mandi Live Glance -->
+              <div class="mpc-entry-gov-summary"
+                style="margin-top: 10px; font-size: 13px; line-height: 1.6; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; background: rgba(255,255,255,0.85); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(46,125,50,0.25);">
+                <div>Your crop: <strong id="dash-gov-crop-name" style="color: var(--ks-evergreen);">Rice</strong></div>
+                <div>Best available government price: <strong id="dash-gov-best-price"
+                    style="color: #2E7D32;">Loading...</strong></div>
+                <div>Best estimated net realization: <strong id="dash-gov-net-realization"
+                    style="color: #1565C0;">Loading...</strong></div>
+                <div id="dash-gov-freshness"
+                  style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600; color: #2E7D32; font-size: 12px;">
+                  <span>✓ Government data</span>
+                  <span id="dash-gov-freshness-text" style="color: #555; font-weight: 500;">· Loading latest report</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mpc-entry-card__right">
+            <div class="mpc-entry-card__stats">
+              <div class="mpc-entry-card__stat"><span class="mpc-entry-card__stat-val">45+</span><span
+                  class="mpc-entry-card__stat-lbl">Mandis</span></div>
+              <div class="mpc-entry-card__stat"><span class="mpc-entry-card__stat-val">15</span><span
+                  class="mpc-entry-card__stat-lbl">Crops</span></div>
+              <div class="mpc-entry-card__stat"><span class="mpc-entry-card__stat-val"
+                  style="color: #2E7D32;">Gov</span><span class="mpc-entry-card__stat-lbl">Verified</span></div>
+            </div>
+            <button class="btn btn--primary mpc-entry-card__btn"
+              onclick="event.stopPropagation(); location.href='mandi-compare.html'">
+              Compare Markets <i data-lucide="arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 6. NEARBY MANDIS — INTERACTIVE INDIA MANDI MAP ── -->
+    <section class="dash-section" id="dash-mandi-map">
+      <div class="container">
+        <div class="dash-section__header mandi-section-header">
+          <div>
+            <h2 class="dash-section__title" data-i18n="farmer.nearbyMandisMapTitle">Nearby Mandis (India)</h2>
+            <p class="dash-section__subtitle">Locate APMC markets across India, compare live commodity prices & get AI
+              selling advice</p>
+          </div>
+          <div class="mandi-header-actions">
+            <button class="btn btn--secondary btn--sm" id="mandi-btn-view-india" title="Reset view to whole India">
+              <span data-i18n="farmer.viewAllIndia">🇮🇳 View All India</span>
+            </button>
+            <button class="btn btn--secondary btn--sm" id="mandi-btn-my-loc-hdr">
+              <i data-lucide="crosshair"></i> <span data-i18n="farmer.myLocation">My Location</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- AI Selling Assistant Card -->
+        <div class="mandi-ai-card" id="mandi-ai-card">
+          <div class="mandi-ai-card__header">
+            <div class="mandi-ai-card__title-row">
+              <span class="mandi-ai-badge"><i data-lucide="sparkles"></i> <span data-i18n="farmer.aiSellingAssistant">AI
+                  Selling Assistant</span></span>
+              <span class="mandi-ai-card__crop-tag" id="mandi-ai-crop-tag">🌾 Rice Analysis</span>
+            </div>
+            <span class="mandi-ai-card__status">🟢 Updated for Today</span>
+          </div>
+          <div class="mandi-ai-card__body">
+            <div class="mandi-ai-card__msg" id="mandi-ai-msg">
+              <span data-i18n="farmer.analyzingNearbyMarkets">Analyzing nearby markets for your location...</span>
+            </div>
+            <div class="mandi-ai-card__actions" id="mandi-ai-actions">
+              <!-- Dynamically rendered -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="mandi-filter-bar">
+          <!-- Search Row -->
+          <div class="mandi-search-row">
+            <div class="mandi-search-box">
+              <i data-lucide="search" class="mandi-search-icon"></i>
+              <input type="text" id="mandi-search-input" class="mandi-search-input"
+                placeholder="Search 80+ mandis, cities, or states (e.g. Pune, Indore, Khanna, Rajkot, Guntur)..."
+                autocomplete="off">
+              <button class="mandi-search-clear" id="mandi-search-clear" style="display:none;"
+                aria-label="Clear search">✕</button>
+            </div>
+            <div id="mandi-user-location-text" class="mandi-user-location" style="display:none;"></div>
+          </div>
+
+          <!-- Controls Row -->
+          <div class="mandi-filter-row">
+            <div class="mandi-filter-row__left">
+              <!-- Crop Dropdown (15 Agricultural Commodities) -->
+              <div class="mandi-filter-group">
+                <label class="mandi-filter-label" for="mandi-crop-filter">Crop:</label>
+                <select id="mandi-crop-filter" class="dash-filter-select">
+                  <option value="rice">🌾 Rice</option>
+                  <option value="wheat">🌾 Wheat</option>
+                  <option value="onion">🧅 Onion</option>
+                  <option value="tomato">🍅 Tomato</option>
+                  <option value="maize">🌽 Maize</option>
+                  <option value="soybean">🫘 Soybean</option>
+                  <option value="potato">🥔 Potato</option>
+                  <option value="chilli">🌶️ Chilli</option>
+                  <option value="groundnut">🥜 Groundnut</option>
+                  <option value="cotton">☁️ Cotton</option>
+                  <option value="sugarcane">🎋 Sugarcane</option>
+                  <option value="mango">🥭 Mango</option>
+                  <option value="banana">🍌 Banana</option>
+                  <option value="grapes">🍇 Grapes</option>
+                  <option value="pulses">🥣 Pulses</option>
+                </select>
+              </div>
+
+              <!-- State Filter -->
+              <div class="mandi-filter-group">
+                <label class="mandi-filter-label" for="mandi-state-filter">State:</label>
+                <select id="mandi-state-filter" class="dash-filter-select">
+                  <option value="all">🇮🇳 All India</option>
+                  <option value="Maharashtra">Maharashtra</option>
+                  <option value="Madhya Pradesh">Madhya Pradesh</option>
+                  <option value="Gujarat">Gujarat</option>
+                  <option value="Punjab">Punjab</option>
+                  <option value="Haryana">Haryana</option>
+                  <option value="Uttar Pradesh">Uttar Pradesh</option>
+                  <option value="Rajasthan">Rajasthan</option>
+                  <option value="Karnataka">Karnataka</option>
+                  <option value="Telangana">Telangana</option>
+                  <option value="Andhra Pradesh">Andhra Pradesh</option>
+                  <option value="Tamil Nadu">Tamil Nadu</option>
+                  <option value="Bihar">Bihar</option>
+                  <option value="West Bengal">West Bengal</option>
+                  <option value="Odisha">Odisha</option>
+                </select>
+              </div>
+
+              <!-- Distance Filter Pills -->
+              <div class="mandi-filter-group mandi-dist-group">
+                <label class="mandi-filter-label">Radius:</label>
+                <div class="mandi-dist-btns">
+                  <button class="mandi-dist-btn" data-dist="10">10 km</button>
+                  <button class="mandi-dist-btn" data-dist="25">25 km</button>
+                  <button class="mandi-dist-btn" data-dist="50">50 km</button>
+                  <button class="mandi-dist-btn" data-dist="100">100 km</button>
+                  <button class="mandi-dist-btn" data-dist="250">250 km</button>
+                  <button class="mandi-dist-btn mandi-dist-btn--active" data-dist="0">All India</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="mandi-filter-row__right">
+              <!-- Map / List Toggle -->
+              <div class="mandi-toggle">
+                <button class="mandi-toggle-btn mandi-toggle-btn--active" data-view="map" aria-label="Map View">
+                  <i data-lucide="map"></i> <span>Map</span>
+                </button>
+                <button class="mandi-toggle-btn" data-view="list" aria-label="List View">
+                  <i data-lucide="list"></i> <span>List</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Map + List Split Layout -->
+        <div class="mandi-layout" id="mandi-main-layout">
+
+          <!-- LEFT: MAP -->
+          <div class="mandi-map-wrap" id="mandi-map-wrap">
+            <div class="mandi-map-container" id="mandi-map-container">
+
+              <!-- Loading State -->
+              <div class="mandi-map-loading" id="mandi-map-loading">
+                <div class="dash-spinner"></div>
+                <p data-i18n="farmer.loadingMandisMap">Loading Indian Mandis Map...</p>
+              </div>
+
+              <!-- Leaflet Map Container -->
+              <div id="mandi-map" class="mandi-map"></div>
+
+              <!-- Custom Map Controls -->
+              <div class="mandi-map-controls" id="mandi-map-controls">
+                <button class="mandi-map-ctrl" id="mandi-zoom-in" title="Zoom In" aria-label="Zoom in">＋</button>
+                <button class="mandi-map-ctrl" id="mandi-zoom-out" title="Zoom Out" aria-label="Zoom out">−</button>
+                <button class="mandi-map-ctrl mandi-map-ctrl--loc" id="mandi-my-location" title="Center on My Location"
+                  aria-label="Center on my location">◎</button>
+                <button class="mandi-map-ctrl mandi-map-ctrl--india" id="mandi-ctrl-india"
+                  title="Reset View to All India" aria-label="View whole India">🇮🇳</button>
+              </div>
+
+              <!-- Location Permission Prompt (over map) -->
+              <div class="mandi-location-prompt" id="mandi-location-prompt" style="display:none;">
+                <div class="mandi-location-prompt__card">
+                  <div class="mandi-location-prompt__icon"><i data-lucide="map-pin"></i></div>
+                  <h4>Find Nearby Mandis</h4>
+                  <p>Allow location access to find closest agricultural markets near your farm.</p>
+                  <p class="mandi-location-status" id="mandi-location-status" style="display:none;"></p>
+                  <button class="btn btn--primary btn--sm" id="mandi-use-location-btn">📍 Use My Location</button>
+                  <div class="mandi-location-prompt__or" data-i18n="farmer.orChooseCity">or choose city</div>
+                  <select id="mandi-manual-location" class="dash-filter-select">
+                    <option value="">Select your city in India...</option>
+                    <optgroup label="Maharashtra">
+                      <option value="Pune">Pune</option>
+                      <option value="Mumbai">Mumbai / Vashi</option>
+                      <option value="Nashik">Nashik</option>
+                      <option value="Nagpur">Nagpur</option>
+                      <option value="Solapur">Solapur</option>
+                      <option value="Kolhapur">Kolhapur</option>
+                      <option value="Aurangabad">Chhatrapati Sambhajinagar</option>
+                      <option value="Satara">Satara</option>
+                      <option value="Sangli">Sangli</option>
+                      <option value="Ahmednagar">Ahmednagar</option>
+                      <option value="Jalgaon">Jalgaon</option>
+                      <option value="Akola">Akola</option>
+                      <option value="Amravati">Amravati</option>
+                      <option value="Latur">Latur</option>
+                      <option value="Nanded">Nanded</option>
+                      <option value="Dhule">Dhule</option>
+                    </optgroup>
+                    <optgroup label="Punjab & Haryana">
+                      <option value="Ludhiana">Ludhiana / Khanna</option>
+                      <option value="Amritsar">Amritsar</option>
+                      <option value="Jalandhar">Jalandhar</option>
+                      <option value="Patiala">Patiala</option>
+                      <option value="Bathinda">Bathinda</option>
+                      <option value="Karnal">Karnal</option>
+                      <option value="Hisar">Hisar</option>
+                      <option value="Panipat">Panipat</option>
+                      <option value="Sirsa">Sirsa</option>
+                      <option value="Rohtak">Rohtak</option>
+                      <option value="Ambala">Ambala</option>
+                    </optgroup>
+                    <optgroup label="Madhya Pradesh">
+                      <option value="Indore">Indore</option>
+                      <option value="Bhopal">Bhopal</option>
+                      <option value="Ujjain">Ujjain</option>
+                      <option value="Dewas">Dewas</option>
+                      <option value="Ratlam">Ratlam</option>
+                      <option value="Gwalior">Gwalior</option>
+                      <option value="Jabalpur">Jabalpur</option>
+                      <option value="Sagar">Sagar</option>
+                    </optgroup>
+                    <optgroup label="Gujarat">
+                      <option value="Ahmedabad">Ahmedabad</option>
+                      <option value="Rajkot">Rajkot</option>
+                      <option value="Surat">Surat</option>
+                      <option value="Vadodara">Vadodara</option>
+                      <option value="Anand">Anand</option>
+                      <option value="Mehsana">Mehsana / Unjha</option>
+                      <option value="Bhavnagar">Bhavnagar</option>
+                    </optgroup>
+                    <optgroup label="Rajasthan & Uttar Pradesh">
+                      <option value="Jaipur">Jaipur</option>
+                      <option value="Kota">Kota</option>
+                      <option value="Jodhpur">Jodhpur</option>
+                      <option value="Bikaner">Bikaner</option>
+                      <option value="Sri Ganganagar">Sri Ganganagar</option>
+                      <option value="Lucknow">Lucknow</option>
+                      <option value="Kanpur">Kanpur</option>
+                      <option value="Agra">Agra</option>
+                      <option value="Varanasi">Varanasi</option>
+                      <option value="Prayagraj">Prayagraj</option>
+                      <option value="Meerut">Meerut</option>
+                      <option value="Bareilly">Bareilly</option>
+                      <option value="Gorakhpur">Gorakhpur</option>
+                    </optgroup>
+                    <optgroup label="South India">
+                      <option value="Bengaluru">Bengaluru (Karnataka)</option>
+                      <option value="Hubballi">Hubballi (Karnataka)</option>
+                      <option value="Mysuru">Mysuru (Karnataka)</option>
+                      <option value="Belagavi">Belagavi (Karnataka)</option>
+                      <option value="Hyderabad">Hyderabad (Telangana)</option>
+                      <option value="Warangal">Warangal (Telangana)</option>
+                      <option value="Nizamabad">Nizamabad (Telangana)</option>
+                      <option value="Vijayawada">Vijayawada (Andhra)</option>
+                      <option value="Guntur">Guntur (Andhra)</option>
+                      <option value="Kurnool">Kurnool (Andhra)</option>
+                      <option value="Chennai">Chennai (Tamil Nadu)</option>
+                      <option value="Coimbatore">Coimbatore (Tamil Nadu)</option>
+                      <option value="Erode">Erode (Tamil Nadu)</option>
+                      <option value="Madurai">Madurai (Tamil Nadu)</option>
+                    </optgroup>
+                    <optgroup label="Other States">
+                      <option value="Patna">Patna (Bihar)</option>
+                      <option value="Kolkata">Kolkata (West Bengal)</option>
+                      <option value="Bhubaneswar">Bhubaneswar (Odisha)</option>
+                      <option value="Raipur">Raipur (Chhattisgarh)</option>
+                      <option value="Ranchi">Ranchi (Jharkhand)</option>
+                      <option value="Guwahati">Guwahati (Assam)</option>
+                      <option value="Kochi">Kochi (Kerala)</option>
+                      <option value="Panaji">Panaji (Goa)</option>
+                      <option value="Shimla">Shimla (Himachal)</option>
+                      <option value="Dehradun">Dehradun (Uttarakhand)</option>
+                      <option value="Jammu">Jammu (J&K)</option>
+                    </optgroup>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Floating Best Market Card -->
+              <div class="mandi-best-card" id="mandi-best-card" style="display:none;"></div>
+
+              <!-- Popup Container -->
+              <div class="mandi-popup-container" id="mandi-popup-container" style="display:none;"></div>
+
+            </div>
+          </div>
+
+          <!-- RIGHT: LIST PANEL -->
+          <div class="mandi-list-wrap" id="mandi-list-wrap">
+            <div class="mandi-list-panel" id="mandi-list-panel">
+              <!-- Rendered dynamically by mandi-map.js -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer dash-footer">
+    <div class="container">
+      <div class="footer__grid">
+        <!-- Col 1: Brand & Helpline -->
+        <div>
+          <div class="footer__brand">
+            <i data-lucide="sprout" style="width:20px;height:20px;"></i>
+            <span>KhetSetu</span>
+          </div>
+          <p class="footer__tagline" data-i18n="common.heroTagline">Know the Price. Choose the Market. Sell Better.</p>
+          <div class="footer__helpline-box">
+            <i data-lucide="phone-call" style="width:18px; height:18px; color:var(--ks-mint);"></i>
+            <div>
+              <div style="font-size:11px; color:rgba(255,255,255,0.7);" data-i18n="common.kisanHelpline">Kisan Helpline
+                (Toll Free)</div>
+              <div style="font-size:14px; font-weight:800; color:#FFFFFF;" data-i18n="footer.tollFreeHelpline">
+                1800-180-1551 (Toll Free)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Col 2: Farmer Services -->
+        <div>
+          <div class="footer__col-title" data-i18n="footer.farmerServices">Farmer Services</div>
+          <ul class="footer__col-links">
+            <li><a href="dashboard.html" class="footer__link"><i data-lucide="layout-dashboard"
+                  style="width:13px;height:13px;"></i> <span data-i18n="navigation.dashboard">Dashboard</span></a></li>
+            <li><a href="lots.html" class="footer__link"><i data-lucide="package" style="width:13px;height:13px;"></i>
+                <span data-i18n="navigation.myLots">My Lots</span></a></li>
+            <li><a href="buyers.html" class="footer__link"><i data-lucide="message-square"
+                  style="width:13px;height:13px;"></i> <span data-i18n="navigation.buyerInquiries">Buyer
+                  Inquiries</span></a></li>
+            <li><a href="orders.html" class="footer__link"><i data-lucide="clipboard-list"
+                  style="width:13px;height:13px;"></i> <span data-i18n="navigation.orders">Orders</span></a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Market & Storage -->
+        <div>
+          <div class="footer__col-title" data-i18n="footer.marketStorage">Market & Storage</div>
+          <ul class="footer__col-links">
+            <li><a href="market.html" class="footer__link"><i data-lucide="bar-chart-3"
+                  style="width:13px;height:13px;"></i> <span data-i18n="navigation.market">Market Prices</span></a></li>
+            <li><a href="mandi-compare.html" class="footer__link"><i data-lucide="trending-up"
+                  style="width:13px;height:13px;"></i> <span data-i18n="navigation.compare">Mandi Compare</span></a>
+            </li>
+            <li><a href="storage.html" class="footer__link"><i data-lucide="warehouse"
+                  style="width:13px;height:13px;"></i> <span data-i18n="navigation.storage">Storage Options</span></a>
+            </li>
+            <li><a href="ai-forecast.html" class="footer__link"><i data-lucide="brain"
+                  style="width:13px;height:13px;"></i> <span data-i18n="navigation.aiForecast">AI Forecast</span></a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Col 4: Support & Protection -->
+        <div>
+          <div class="footer__col-title" data-i18n="footer.supportProtection">Support & Protection</div>
+          <ul class="footer__col-links">
+            <li><a href="#" class="footer__link" onclick="openHelpModal()"><i data-lucide="help-circle"
+                  style="width:13px;height:13px;"></i> <span data-i18n="common.help">Kisan Support</span></a></li>
+            <li><a href="disputes.html" class="footer__link"><i data-lucide="scale" style="width:13px;height:13px;"></i>
+                <span data-i18n="navigation.disputes">Trade Disputes</span></a></li>
+            <li><a href="buyer.html" class="footer__link"><i data-lucide="shield-check"
+                  style="width:13px;height:13px;"></i> <span data-i18n="buyers.openPortal">Buyer Portal</span></a></li>
+            <li><a href="index.html" class="footer__link"><i data-lucide="info" style="width:13px;height:13px;"></i>
+                <span data-i18n="common.about">About KhetSetu</span></a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Bottom Bar -->
+      <div class="footer__bottom-row">
+        <div data-i18n="common.footerCopyright">© 2026 KhetSetu AgriTech Platform. All rights reserved.</div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <i data-lucide="shield-check" style="width:14px;height:14px;color:var(--ks-mint);"></i>
+          <span data-i18n="footer.verifiedArchitecture">Govt / APMC & WDRA Standardized Architecture</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MOBILE BOTTOM NAVIGATION -->
+  <nav class="dash-bottom-nav" id="dash-bottom-nav">
+    <a href="dashboard.html" class="dash-bottom-nav__item dash-bottom-nav__item--active" id="bnav-home"><i
+        data-lucide="home"></i><span>Home</span></a>
+    <a href="lots.html" class="dash-bottom-nav__item" id="bnav-lots"><i data-lucide="package"></i><span>My
+        Lots</span></a>
+    <a href="storage.html" class="dash-bottom-nav__item" id="bnav-storage"><i
+        data-lucide="warehouse"></i><span>Storage</span></a>
+    <a href="market.html" class="dash-bottom-nav__item" id="bnav-market"><i
+        data-lucide="bar-chart-3"></i><span>Market</span></a>
+    <a href="ai-forecast.html" class="dash-bottom-nav__item" id="bnav-forecast"><i
+        data-lucide="brain"></i><span>Forecast</span></a>
+    <a href="orders.html" class="dash-bottom-nav__item" id="bnav-orders"><i
+        data-lucide="clipboard-list"></i><span>Orders</span></a>
+  </nav>
+
+  <!-- MODALS -->
+  <!-- 1. MULTI-STEP CROP LOT CREATION WIZARD (8-Step Flow) -->
+  <div class="dash-modal-overlay" id="create-lot-modal-overlay">
+    <div class="dash-modal dash-modal--lg lot-wizard-modal" id="create-lot-modal">
+      <div class="dash-modal__header lot-wizard-header">
+        <div>
+          <h3 class="lot-wizard-title" data-i18n="wizard.title">+ Create New Crop Lot</h3>
+          <p class="lot-wizard-subtitle" data-i18n="wizard.subtitle">Add your crop details to find the right buyer.</p>
+        </div>
+        <button type="button" class="dash-modal__close" id="create-lot-modal-close" aria-label="Close"><i
+            data-lucide="x"></i></button>
+      </div>
+
+      <!-- Compact Horizontal Progress Indicator -->
+      <div class="lot-wizard-stepper-container">
+        <div class="lot-wizard-stepper" id="lot-wizard-stepper">
+          <div class="lot-wizard-step active" data-step="1">
+            <span class="lot-wizard-step-node">1</span>
+            <span class="lot-wizard-step-label" data-i18n="wizard.stepCrop">Crop</span>
+          </div>
+          <span class="lot-wizard-step-arrow">→</span>
+          <div class="lot-wizard-step" data-step="2">
+            <span class="lot-wizard-step-node">2</span>
+            <span class="lot-wizard-step-label" data-i18n="wizard.stepQuantity">Quantity</span>
+          </div>
+          <span class="lot-wizard-step-arrow">→</span>
+          <div class="lot-wizard-step" data-step="3">
+            <span class="lot-wizard-step-node">3</span>
+            <span class="lot-wizard-step-label" data-i18n="wizard.stepQuality">Quality</span>
+          </div>
+          <span class="lot-wizard-step-arrow">→</span>
+          <div class="lot-wizard-step" data-step="4">
+            <span class="lot-wizard-step-node">4</span>
+            <span class="lot-wizard-step-label" data-i18n="wizard.stepFarm">Farm</span>
+          </div>
+          <span class="lot-wizard-step-arrow">→</span>
+          <div class="lot-wizard-step" data-step="5">
+            <span class="lot-wizard-step-node">5</span>
+            <span class="lot-wizard-step-label" data-i18n="wizard.stepPrice">Price</span>
+          </div>
+          <span class="lot-wizard-step-arrow">→</span>
+          <div class="lot-wizard-step" data-step="6">
+            <span class="lot-wizard-step-node">6</span>
+            <span class="lot-wizard-step-label" data-i18n="wizard.stepDates">Dates</span>
+          </div>
+          <span class="lot-wizard-step-arrow">→</span>
+          <div class="lot-wizard-step" data-step="7">
+            <span class="lot-wizard-step-node">7</span>
+            <span class="lot-wizard-step-label" data-i18n="wizard.stepDetails">Details</span>
+          </div>
+          <span class="lot-wizard-step-arrow">→</span>
+          <div class="lot-wizard-step" data-step="8">
+            <span class="lot-wizard-step-node">8</span>
+            <span class="lot-wizard-step-label" data-i18n="wizard.stepPublish">Publish</span>
+          </div>
+        </div>
+      </div>
+
+      <form id="create-lot-form" class="lot-wizard-form">
+        <div class="lot-wizard-body">
+          <!-- Step 1: Crop Selection -->
+          <div class="lot-wizard-pane active" id="wizard-pane-1">
+            <div class="lot-step-prompt" data-i18n="wizard.chooseCrop">Choose Your Crop</div>
+            <div class="lot-step-hint" data-i18n="wizard.chooseCropHint">Select the agricultural commodity you want to
+              sell:</div>
+            <div class="lot-crop-chips-grid">
+              <div class="lot-crop-chip selected" data-crop="tomato">
+                <div class="lot-crop-chip-icon">🍅</div>
+                <div class="lot-crop-chip-name" data-i18n="crops.tomato">Tomato</div>
+                <div class="lot-crop-chip-price">₹2,400/q</div>
+              </div>
+              <div class="lot-crop-chip" data-crop="rice">
+                <div class="lot-crop-chip-icon">🌾</div>
+                <div class="lot-crop-chip-name" data-i18n="crops.rice">Rice</div>
+                <div class="lot-crop-chip-price">₹2,850/q</div>
+              </div>
+              <div class="lot-crop-chip" data-crop="wheat">
+                <div class="lot-crop-chip-icon">🌾</div>
+                <div class="lot-crop-chip-name" data-i18n="crops.wheat">Wheat</div>
+                <div class="lot-crop-chip-price">₹2,650/q</div>
+              </div>
+              <div class="lot-crop-chip" data-crop="onion">
+                <div class="lot-crop-chip-icon">🧅</div>
+                <div class="lot-crop-chip-name" data-i18n="crops.onion">Onion</div>
+                <div class="lot-crop-chip-price">₹2,850/q</div>
+              </div>
+              <div class="lot-crop-chip" data-crop="soybean">
+                <div class="lot-crop-chip-icon">🫘</div>
+                <div class="lot-crop-chip-name" data-i18n="crops.soybean">Soybean</div>
+                <div class="lot-crop-chip-price">₹4,650/q</div>
+              </div>
+              <div class="lot-crop-chip" data-crop="potato">
+                <div class="lot-crop-chip-icon">🥔</div>
+                <div class="lot-crop-chip-name" data-i18n="crops.potato">Potato</div>
+                <div class="lot-crop-chip-price">₹1,800/q</div>
+              </div>
+              <div class="lot-crop-chip" data-crop="chilli">
+                <div class="lot-crop-chip-icon">🌶️</div>
+                <div class="lot-crop-chip-name" data-i18n="crops.chilli">Chilli</div>
+                <div class="lot-crop-chip-price">₹8,500/q</div>
+              </div>
+              <div class="lot-crop-chip" data-crop="cotton">
+                <div class="lot-crop-chip-icon">☁️</div>
+                <div class="lot-crop-chip-name" data-i18n="crops.cotton">Cotton</div>
+                <div class="lot-crop-chip-price">₹6,800/q</div>
+              </div>
+              <div class="lot-crop-chip" data-crop="maize">
+                <div class="lot-crop-chip-icon">🌽</div>
+                <div class="lot-crop-chip-name" data-i18n="crops.maize">Maize</div>
+                <div class="lot-crop-chip-price">₹2,300/q</div>
+              </div>
+              <div class="lot-crop-chip" data-crop="pulses">
+                <div class="lot-crop-chip-icon">🥣</div>
+                <div class="lot-crop-chip-name" data-i18n="crops.pulses">Pulses</div>
+                <div class="lot-crop-chip-price">₹5,200/q</div>
+              </div>
+            </div>
+            <input type="hidden" id="wiz-crop-val" value="tomato">
+            <input type="hidden" id="lot-crop-select" value="tomato">
+          </div>
+
+          <!-- Step 2: Available Quantity -->
+          <div class="lot-wizard-pane" id="wizard-pane-2">
+            <div class="lot-step-prompt" data-i18n="wizard.quantityVariety">Quantity & Crop Variety</div>
+            <div class="lot-step-hint" data-i18n="wizard.quantityVarietyHint">Specify your harvest volume for bulk or
+              lot aggregation:</div>
+            <div class="dash-modal__field">
+              <label for="wiz-qty-input" class="dash-field-label"><span data-i18n="wizard.harvestQty">Available Harvest
+                  Quantity</span> <span style="color:#C62828;">*</span></label>
+              <div class="dash-input-group">
+                <input type="number" id="wiz-qty-input" class="dash-form-input dash-form-input--lg"
+                  placeholder="e.g. 25" min="1" max="10000" value="25" required>
+                <span class="dash-input-addon" data-i18n="common.quintals">Quintals</span>
+              </div>
+              <input type="hidden" id="lot-qty-input" value="25">
+              <div class="dash-field-sub">1 Quintal = 100 kg · 10 Quintals = 1 Metric Tonne</div>
+            </div>
+            <div class="dash-modal__field" style="margin-top: 14px;">
+              <label for="wiz-variety-input" class="dash-field-label" data-i18n="wizard.cropVariety">Crop Variety
+                (Optional)</label>
+              <input type="text" id="wiz-variety-input" class="dash-form-input"
+                placeholder="e.g. Lokwan / Sharbati / Desi / Hybrid" value="Unknown">
+            </div>
+          </div>
+
+          <!-- Step 3: Quality Evidence (Optional) -->
+          <div class="lot-wizard-pane" id="wizard-pane-3">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+              <div>
+                <div class="lot-step-prompt" style="margin-bottom: 2px;">QUALITY EVIDENCE</div>
+                <div class="lot-step-hint" style="margin-bottom: 0;">Help buyers understand the quality of your produce.</div>
+              </div>
+              <button type="button" id="wiz-qe-skip-btn" onclick="FarmerFlow.selectQualityEvidenceTab('skip')"
+                style="font-size: 12.5px; color: #666; background: none; border: none; cursor: pointer; text-decoration: underline; padding: 4px;">
+                Skip for now
+              </button>
+            </div>
+
+            <!-- Active selected evidence summary pill -->
+            <div id="qe-active-summary" style="display: none; margin-bottom: 12px; padding: 10px 14px; border-radius: 8px; background: #E8F5E9; border: 1px solid #A5D6A7; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+              <div id="qe-active-summary-text" style="font-size: 12.5px; font-weight: 700; color: #1B5E20; display: flex; align-items: center; gap: 8px;"></div>
+              <button type="button" onclick="FarmerFlow.clearQualityEvidence()" style="background: none; border: none; color: #B71C1C; font-size: 12px; font-weight: 700; cursor: pointer; text-decoration: underline;">
+                Remove
+              </button>
+            </div>
+
+            <!-- 3 Options Buttons -->
+            <div class="qe-options-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 10px; margin-bottom: 12px;">
+              <!-- Option 1: AI Photo -->
+              <button type="button" id="qe-btn-photo" class="qe-option-card" onclick="FarmerFlow.selectQualityEvidenceTab('photo')"
+                style="padding: 12px 10px; border-radius: 10px; border: 1.5px solid #CCDBCD; background: #FFFFFF; text-align: left; cursor: pointer; transition: all 0.2s ease;">
+                <div style="font-size: 20px; margin-bottom: 4px;">📷</div>
+                <div style="font-size: 13px; font-weight: 800; color: #12372A;">Check with Photo</div>
+                <div style="font-size: 11px; color: #666; margin-top: 2px;">AI-assisted visual assessment</div>
+              </button>
+
+              <!-- Option 2: Report -->
+              <button type="button" id="qe-btn-report" class="qe-option-card" onclick="FarmerFlow.selectQualityEvidenceTab('report')"
+                style="padding: 12px 10px; border-radius: 10px; border: 1.5px solid #CCDBCD; background: #FFFFFF; text-align: left; cursor: pointer; transition: all 0.2s ease;">
+                <div style="font-size: 20px; margin-bottom: 4px;">📄</div>
+                <div style="font-size: 13px; font-weight: 800; color: #12372A;">I already have a report</div>
+                <div style="font-size: 11px; color: #666; margin-top: 2px;">Upload a quality or lab report</div>
+              </button>
+
+              <!-- Option 3: Manual -->
+              <button type="button" id="qe-btn-manual" class="qe-option-card" onclick="FarmerFlow.selectQualityEvidenceTab('manual')"
+                style="padding: 12px 10px; border-radius: 10px; border: 1.5px solid #CCDBCD; background: #FFFFFF; text-align: left; cursor: pointer; transition: all 0.2s ease;">
+                <div style="font-size: 20px; margin-bottom: 4px;">✍️</div>
+                <div style="font-size: 13px; font-weight: 800; color: #12372A;">Enter manually</div>
+                <div style="font-size: 11px; color: #666; margin-top: 2px;">Add quality information yourself</div>
+              </button>
+            </div>
+
+            <!-- Photo Upload & AI Scan Panel (Option 1) -->
+            <div id="qe-panel-photo" style="display: none; background: #FFFFFF; border: 1.5px solid #CCDBCD; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+              <!-- Hidden native file inputs (camera + upload) -->
+              <input type="file" id="qe-photo-camera" accept="image/*" capture="environment" class="sr-only" style="display:none;" onchange="FarmerFlow.handleQualityPhotoSelected(event)">
+              <input type="file" id="qe-photo-upload" accept="image/*" class="sr-only" style="display:none;" onchange="FarmerFlow.handleQualityPhotoSelected(event)">
+              <input type="file" id="qe-photo-gallery" accept="image/*" class="sr-only" style="display:none;" onchange="FarmerFlow.handleQualityPhotoSelected(event)">
+              <input type="file" id="qe-photo-file" accept="image/*" class="sr-only" style="display:none;" onchange="FarmerFlow.handleQualityPhotoSelected(event)">
+
+              <!-- Header -->
+              <div style="margin-bottom: 12px;">
+                <div style="font-size: 13px; font-weight: 800; color: #12372A; text-transform: uppercase; display: flex; align-items: center; gap: 6px; letter-spacing: 0.5px; margin-bottom: 4px;">
+                  <i data-lucide="camera" style="width:16px;height:16px;color:var(--ks-sage);"></i> CHECK WITH PHOTO
+                </div>
+                <div style="font-size: 12px; color: #555; line-height: 1.45;">
+                  Use your camera or choose an existing photo. We'll check whether the photo matches your selected crop and assess its visible condition.
+                </div>
+              </div>
+
+              <!-- STATE 1: IDLE / START SCREEN -->
+              <div id="qe-state-idle" style="display: block;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px;">
+                  <!-- Take a photo Card (Camera) -->
+                  <button type="button" id="qe-take-photo" class="btn" onclick="FarmerFlow.openCameraModal()"
+                    style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px 12px; background: #F4F8F4; border: 1.5px dashed #2D6A4F; border-radius: 10px; cursor: pointer; text-align: center; transition: all 0.2s ease;">
+                    <div style="font-size: 24px; margin-bottom: 4px;">📷</div>
+                    <div style="font-size: 13.5px; font-weight: 800; color: #12372A;">Take a photo</div>
+                    <div style="font-size: 11px; color: #555; margin-top: 2px;">Use your camera</div>
+                  </button>
+                  <!-- Choose a photo Card (Gallery/File) -->
+                  <button type="button" id="qe-upload-photo" class="btn" onclick="document.getElementById('qe-photo-upload').click()"
+                    style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px 12px; background: #F8FAF8; border: 1.5px dashed #A5D6A7; border-radius: 10px; cursor: pointer; text-align: center; transition: all 0.2s ease;">
+                    <div style="font-size: 24px; margin-bottom: 4px;">🖼️</div>
+                    <div style="font-size: 13.5px; font-weight: 800; color: #12372A;">Choose a photo</div>
+                    <div style="font-size: 11px; color: #555; margin-top: 2px;">Select from your device</div>
+                  </button>
+                </div>
+
+                <!-- Photo Tips Box -->
+                <div style="background: #FDFCF9; border: 1px solid #E5E7EB; border-radius: 8px; padding: 10px 14px;">
+                  <div style="font-size: 11.5px; font-weight: 800; color: #12372A; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
+                    💡 For a better assessment
+                  </div>
+                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 6px 12px; font-size: 11px; color: #555;">
+                    <div>• Use good lighting</div>
+                    <div>• Keep the produce clearly visible</div>
+                    <div>• Avoid blurry photos</div>
+                    <div>• Avoid covering the produce</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- STATE 2: PREVIEW SCREEN (Photo selected, awaiting analyze) -->
+              <div id="qe-state-preview" style="display: none; margin-bottom: 10px;">
+                <div style="font-size: 12px; font-weight: 700; color: #166534; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                  <i data-lucide="check-circle" style="width:14px;height:14px;color:#16a34a;"></i> Photo selected
+                </div>
+                <div style="width: 100%; border-radius: 10px; overflow: hidden; background: #F0F4F0; border: 1.5px solid #CCDBCD; margin-bottom: 12px; text-align: center;">
+                  <img id="qe-photo-preview" src="" alt="Selected crop preview" style="max-width: 100%; max-height: 220px; object-fit: contain; display: block; margin: 0 auto;">
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                  <button type="button" id="qe-btn-analyze-photo" class="btn btn--primary btn--sm" onclick="FarmerFlow.analyzeQualityPhoto()" style="flex: 1; min-width: 140px; padding: 10px 14px; font-weight: 800;">
+                    <i data-lucide="sparkles"></i> Analyze Photo
+                  </button>
+                  <button type="button" class="btn btn--secondary btn--sm" onclick="document.getElementById('qe-photo-upload').click()" style="padding: 10px 12px;">
+                    <i data-lucide="image"></i> Choose another
+                  </button>
+                  <button type="button" class="btn btn--sm" onclick="FarmerFlow.clearQualityPhoto()" style="padding: 10px 12px; background: #FEF2F2; color: #991B1B; border: 1px solid #FCA5A5;">
+                    <i data-lucide="trash-2"></i> Remove
+                  </button>
+                </div>
+              </div>
+
+              <!-- STATE 3: LOADING SCREEN -->
+              <div id="qe-state-loading" style="display: none; padding: 24px 16px; text-align: center; background: #F8FAF8; border-radius: 10px; margin-bottom: 10px; border: 1px solid #E2E8F0;">
+                <div class="dash-spinner" style="width: 32px; height: 32px; margin: 0 auto 12px auto; border-width: 3px; border-color: rgba(18, 55, 42, 0.2); border-top-color: #12372A;"></div>
+                <div style="font-size: 14px; font-weight: 800; color: var(--ks-evergreen); margin-bottom: 6px;">Checking your photo…</div>
+                <div style="font-size: 12px; color: #555555; line-height: 1.45; max-width: 280px; margin: 0 auto;">
+                  We're checking the crop and visible condition.<br>This may take a few seconds.
+                </div>
+              </div>
+
+              <!-- STATE 4: SUCCESS SCREEN (AI_SUCCESS) -->
+              <div id="qe-state-success" style="display: none; background: #F0FDF4; border: 1.5px solid #86EFAC; border-radius: 10px; padding: 14px; margin-bottom: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                  <strong style="font-size: 13px; color: #166534; display: flex; align-items: center; gap: 6px; letter-spacing: 0.4px; text-transform: uppercase;">
+                    <i data-lucide="sparkles" style="width: 16px; height: 16px; color: #16a34a;"></i>
+                    AI-ASSISTED QUALITY ASSESSMENT
+                  </strong>
+                </div>
+
+                <div id="qe-photo-annotated-wrap" style="display: none; margin-bottom: 10px; text-align: center;">
+                  <img id="qe-photo-annotated-img" src="" alt="AI Annotated Detection" style="max-width: 100%; max-height: 220px; border-radius: 8px; border: 1.5px solid #22c55e; object-fit: contain; background: #000; display: block; margin: 0 auto;">
+                  <div style="font-size: 11px; color: #15803d; margin-top: 4px; font-weight: 600;">Annotated detection image</div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-bottom: 10px; font-size: 12.5px;">
+                  <div style="background: #FFFFFF; padding: 8px 10px; border-radius: 6px; border: 1px solid #BBF7D0;">
+                    <span style="font-size: 11px; color: #666; display: block;">Crop</span>
+                    <strong id="qe-photo-crop" style="color: var(--ks-evergreen); font-size: 13.5px;">-</strong>
+                  </div>
+                  <div style="background: #FFFFFF; padding: 8px 10px; border-radius: 6px; border: 1px solid #BBF7D0;">
+                    <span style="font-size: 11px; color: #666; display: block;">Visible condition</span>
+                    <strong id="qe-photo-condition" style="color: var(--ks-evergreen); font-size: 13.5px;">-</strong>
+                  </div>
+                  <div style="background: #FFFFFF; padding: 8px 10px; border-radius: 6px; border: 1px solid #BBF7D0;">
+                    <span style="font-size: 11px; color: #666; display: block;">Detection confidence</span>
+                    <strong id="qe-photo-confidence" style="color: #15803d; font-size: 13.5px;">-</strong>
+                  </div>
+                  <div style="background: #FFFFFF; padding: 8px 10px; border-radius: 6px; border: 1px solid #BBF7D0;">
+                    <span style="font-size: 11px; color: #666; display: block;">Assessment type</span>
+                    <strong style="color: var(--ks-evergreen); font-size: 12px;">Visual object detection</strong>
+                  </div>
+                </div>
+
+                <div style="font-size: 11.5px; color: #166534; margin-bottom: 12px; font-weight: 600;">
+                  Assessment is based on visible features in the uploaded photo.
+                </div>
+
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                  <button type="button" id="qe-btn-use-assessment" class="btn btn--primary btn--sm" onclick="FarmerFlow.applyQualityAssessment()" style="flex: 1; min-width: 140px; padding: 9px 14px; font-weight: 800;">
+                    <i data-lucide="check"></i> Use this assessment
+                  </button>
+                  <button type="button" class="btn btn--secondary btn--sm" onclick="FarmerFlow.retryQualityPhoto()" style="padding: 9px 12px;">
+                    <i data-lucide="refresh-cw"></i> Try another photo
+                  </button>
+                </div>
+              </div>
+
+              <!-- STATE 5: CROP MISMATCH SCREEN (AI_CROP_MISMATCH) -->
+              <div id="qe-state-mismatch" style="display: none; background: #FEF2F2; border: 1.5px solid #F87171; border-radius: 10px; padding: 14px; margin-bottom: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #991B1B;">
+                  <i data-lucide="alert-triangle" style="width: 18px; height: 18px; color: #DC2626; flex-shrink: 0;"></i>
+                  <strong style="font-size: 13.5px;">Photo doesn't match the selected crop</strong>
+                </div>
+                <div id="qe-mismatch-text" style="font-size: 12.5px; color: #7F1D1D; line-height: 1.5; margin-bottom: 12px;">
+                  We couldn't confidently find the selected crop in this photo.
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                  <button type="button" class="btn btn--primary btn--sm" onclick="FarmerFlow.openCameraModal()" style="padding: 8px 12px; font-weight: 700;">
+                    <i data-lucide="camera"></i> Take another photo
+                  </button>
+                  <button type="button" class="btn btn--secondary btn--sm" onclick="document.getElementById('qe-photo-upload').click()" style="padding: 8px 12px;">
+                    <i data-lucide="image"></i> Choose another photo
+                  </button>
+                  <button type="button" class="btn btn--sm" onclick="FarmerFlow.selectQualityEvidenceTab('manual')" style="padding: 8px 12px; background: #FFFFFF; border: 1px solid #CCDBCD; color: #12372A;">
+                    <i data-lucide="edit-3"></i> Enter manually
+                  </button>
+                  <button type="button" class="btn btn--sm" onclick="FarmerFlow.skipQualityEvidence()" style="padding: 8px 12px; background: #FFFFFF; border: 1px solid #CCDBCD; color: #666;">
+                    Skip for now
+                  </button>
+                </div>
+              </div>
+
+              <!-- STATE 6: LOW CONFIDENCE SCREEN (AI_LOW_CONFIDENCE) -->
+              <div id="qe-state-low-confidence" style="display: none; background: #FFFBEB; border: 1.5px solid #FCD34D; border-radius: 10px; padding: 14px; margin-bottom: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #92400E;">
+                  <i data-lucide="alert-circle" style="width: 18px; height: 18px; color: #D97706; flex-shrink: 0;"></i>
+                  <strong style="font-size: 13.5px;">Assessment confidence is low</strong>
+                </div>
+                <div id="qe-low-conf-text" style="font-size: 12.5px; color: #78350F; line-height: 1.5; margin-bottom: 12px;">
+                  We detected the crop, but the visual model isn't confident enough to complete the assessment.
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                  <button type="button" class="btn btn--primary btn--sm" onclick="FarmerFlow.openCameraModal()" style="padding: 8px 12px; font-weight: 700;">
+                    <i data-lucide="camera"></i> Take another photo
+                  </button>
+                  <button type="button" class="btn btn--secondary btn--sm" onclick="document.getElementById('qe-photo-upload').click()" style="padding: 8px 12px;">
+                    <i data-lucide="image"></i> Choose another photo
+                  </button>
+                  <button type="button" class="btn btn--sm" onclick="FarmerFlow.selectQualityEvidenceTab('manual')" style="padding: 8px 12px; background: #FFFFFF; border: 1px solid #CCDBCD; color: #12372A;">
+                    <i data-lucide="edit-3"></i> Enter manually
+                  </button>
+                  <button type="button" class="btn btn--sm" onclick="FarmerFlow.skipQualityEvidence()" style="padding: 8px 12px; background: #FFFFFF; border: 1px solid #CCDBCD; color: #666;">
+                    Skip for now
+                  </button>
+                </div>
+              </div>
+
+              <!-- STATE 7: ERROR / SERVICE UNAVAILABLE SCREEN (AI_ERROR) -->
+              <div id="qe-state-error" style="display: none; background: #FEF2F2; border: 1.5px solid #FCA5A5; border-radius: 10px; padding: 14px; margin-bottom: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #991B1B;">
+                  <i data-lucide="alert-octagon" style="width: 18px; height: 18px; color: #DC2626; flex-shrink: 0;"></i>
+                  <strong style="font-size: 13.5px;">We couldn't check this photo right now</strong>
+                </div>
+                <div id="qe-error-text" style="font-size: 12.5px; color: #7F1D1D; line-height: 1.5; margin-bottom: 12px;">
+                  We couldn't complete the photo assessment right now. You can try another photo or continue another way.
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                  <button type="button" class="btn btn--primary btn--sm" onclick="FarmerFlow.analyzeQualityPhoto()" style="padding: 8px 12px; font-weight: 700;">
+                    <i data-lucide="refresh-cw"></i> Try again
+                  </button>
+                  <button type="button" class="btn btn--secondary btn--sm" onclick="document.getElementById('qe-photo-upload').click()" style="padding: 8px 12px;">
+                    <i data-lucide="image"></i> Choose another photo
+                  </button>
+                  <button type="button" class="btn btn--sm" onclick="FarmerFlow.selectQualityEvidenceTab('manual')" style="padding: 8px 12px; background: #FFFFFF; border: 1px solid #CCDBCD; color: #12372A;">
+                    <i data-lucide="edit-3"></i> Enter manually
+                  </button>
+                  <button type="button" class="btn btn--sm" onclick="FarmerFlow.skipQualityEvidence()" style="padding: 8px 12px; background: #FFFFFF; border: 1px solid #CCDBCD; color: #666;">
+                    Skip for now
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Report Upload Panel (Option 2) -->
+            <div id="qe-panel-report" style="display: none; background: #FFFFFF; border: 1px solid #CCDBCD; border-radius: 10px; padding: 14px; margin-bottom: 12px;">
+              <div style="font-size: 12px; font-weight: 800; color: #12372A; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                <i data-lucide="file-text" style="width:14px;height:14px;"></i> QUALITY REPORT
+              </div>
+              <div class="dash-modal__field" style="margin-bottom: 10px;">
+                <label style="font-size: 12px; font-weight: 700; color: #333;">Upload report (PDF, JPG, JPEG, PNG)</label>
+                <input type="file" id="qe-report-file" class="dash-form-input" accept=".pdf,.jpg,.jpeg,.png" onchange="FarmerFlow.handleReportFileSelect(event)">
+              </div>
+              <div class="dash-form-row">
+                <div class="dash-modal__field">
+                  <label for="qe-report-provider" style="font-size: 11.5px; font-weight: 600;">Provider / laboratory (Optional)</label>
+                  <input type="text" id="qe-report-provider" class="dash-form-input" placeholder="e.g. Mahadhan Agmark Lab" oninput="FarmerFlow.updateReportMetadata()">
+                </div>
+                <div class="dash-modal__field">
+                  <label for="qe-report-number" style="font-size: 11.5px; font-weight: 600;">Report number (Optional)</label>
+                  <input type="text" id="qe-report-number" class="dash-form-input" placeholder="e.g. RPT-2026-8812" oninput="FarmerFlow.updateReportMetadata()">
+                </div>
+              </div>
+              <div class="dash-modal__field" style="margin-bottom: 4px;">
+                <label for="qe-report-date" style="font-size: 11.5px; font-weight: 600;">Report date (Optional)</label>
+                <input type="date" id="qe-report-date" class="dash-form-input" onchange="FarmerFlow.updateReportMetadata()">
+              </div>
+              <div style="font-size: 11px; color: #777; margin-top: 6px;">
+                ℹ️ Stored as farmer-provided quality report.
+              </div>
+            </div>
+
+            <!-- Manual Quality Panel (Option 3) -->
+            <div id="qe-panel-manual" style="display: none; background: #FFFFFF; border: 1px solid #CCDBCD; border-radius: 10px; padding: 14px; margin-bottom: 12px;">
+              <div style="font-size: 12px; font-weight: 800; color: #12372A; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                <i data-lucide="edit-3" style="width:14px;height:14px;"></i> ENTER QUALITY MANUALLY
+              </div>
+              <div class="dash-form-row">
+                <div class="dash-modal__field">
+                  <label for="qe-manual-condition" style="font-size: 11.5px; font-weight: 600;">Condition (Optional)</label>
+                  <select id="qe-manual-condition" class="dash-filter-select" onchange="FarmerFlow.updateManualQuality()">
+                    <option value="">Select Condition</option>
+                    <option value="Fresh">Fresh / Good</option>
+                    <option value="Standard">Standard FAQ</option>
+                    <option value="Dry">Dry / Sun-cured</option>
+                    <option value="Fair">Fair</option>
+                  </select>
+                </div>
+                <div class="dash-modal__field">
+                  <label for="qe-manual-grade" style="font-size: 11.5px; font-weight: 600;">Grade / standard (Optional)</label>
+                  <input type="text" id="qe-manual-grade" class="dash-form-input" placeholder="e.g. FAQ Commercial Standard" oninput="FarmerFlow.updateManualQuality()">
+                </div>
+              </div>
+              <div class="dash-modal__field" style="margin-bottom: 10px;">
+                <label for="qe-manual-desc" style="font-size: 11.5px; font-weight: 600;">Quality description (Optional)</label>
+                <input type="text" id="qe-manual-desc" class="dash-form-input" placeholder="e.g. Machine cleaned, no mold, uniform size" oninput="FarmerFlow.updateManualQuality()">
+              </div>
+              <div class="dash-modal__field" style="margin-bottom: 4px;">
+                <label for="qe-manual-notes" style="font-size: 11.5px; font-weight: 600;">Notes (Optional)</label>
+                <textarea id="qe-manual-notes" class="dash-form-textarea" rows="2" placeholder="Any additional quality notes for buyers..." oninput="FarmerFlow.updateManualQuality()"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4: Farm Location & Dispatch Hub -->
+          <div class="lot-wizard-pane" id="wizard-pane-4">
+            <div class="lot-step-prompt" data-i18n="wizard.farmOrigin">Farm Origin & Dispatch Hub</div>
+            <div class="lot-step-hint" data-i18n="wizard.farmOriginHint">Where should the buyer or transporter pick up
+              your lot?</div>
+            <div class="dash-modal__field">
+              <label for="wiz-location-input" class="dash-field-label"><span data-i18n="wizard.farmVillage">Farm Village
+                  / Dispatch Hub</span> <span style="color:#C62828;">*</span></label>
+              <input type="text" id="wiz-location-input" class="dash-form-input dash-form-input--lg"
+                value="Nashik, Maharashtra" placeholder="Village, Taluka, District, State" required>
+              <input type="hidden" id="lot-location-input" value="Nashik, Maharashtra">
+            </div>
+            <div class="dash-modal__field" style="margin-top: 14px;">
+              <label for="wiz-pincode-input" class="dash-field-label" data-i18n="wizard.pincode">Pincode (6
+                Digits)</label>
+              <input type="text" id="wiz-pincode-input" class="dash-form-input" value="422003" maxlength="6"
+                placeholder="e.g. 422003">
+              <div class="dash-field-sub">Enables automatic distance calculation to mandis and verified buyers</div>
+            </div>
+          </div>
+
+          <!-- Step 5: Expected Price -->
+          <div class="lot-wizard-pane" id="wizard-pane-5">
+            <div class="lot-step-prompt" data-i18n="wizard.expectedBasePrice">Expected Base Price</div>
+            <div class="lot-step-hint" data-i18n="wizard.expectedPriceHint">Set your expected price. Buyers can bid or
+              accept your rate:</div>
+            <div class="dash-modal__field">
+              <label for="wiz-price-input" class="dash-field-label"><span data-i18n="wizard.expectedBasePrice">Expected
+                  Base Price (₹/Quintal)</span> <span style="color:#C62828;">*</span></label>
+              <div class="dash-input-group">
+                <span class="dash-input-prefix">₹</span>
+                <input type="number" id="wiz-price-input" class="dash-form-input dash-form-input--lg"
+                  placeholder="e.g. 2850" min="100" value="2850" required>
+                <span class="dash-input-addon">/ quintal</span>
+              </div>
+              <input type="hidden" id="lot-price-input" value="2850">
+              <div class="dash-field-sub">KhetSetu guarantees 100% Escrow deposit before truck dispatch</div>
+            </div>
+          </div>
+
+          <!-- Step 6: Dates & Dispatch Window -->
+          <div class="lot-wizard-pane" id="wizard-pane-6">
+            <div class="lot-step-prompt" data-i18n="wizard.harvestDates">Harvest & Dispatch Window</div>
+            <div class="lot-step-hint" data-i18n="wizard.harvestDatesHint">When is this crop available for pickup or
+              delivery?</div>
+            <div class="dash-form-row">
+              <div class="dash-modal__field">
+                <label for="wiz-harvest-date" class="dash-field-label" data-i18n="wizard.harvestDate">Harvest
+                  Date</label>
+                <input type="date" id="wiz-harvest-date" class="dash-form-input">
+                <input type="hidden" id="lot-harvest-input">
+              </div>
+              <div class="dash-modal__field">
+                <label for="wiz-available-until" class="dash-field-label" data-i18n="wizard.availableUntil">Available
+                  Until (Deadline)</label>
+                <input type="date" id="wiz-available-until" class="dash-form-input">
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 7: Crop Details & Specifications -->
+          <div class="lot-wizard-pane" id="wizard-pane-7">
+            <div class="lot-step-prompt" data-i18n="wizard.produceSpecs">Produce Specifications</div>
+            <div class="lot-step-hint" data-i18n="wizard.produceSpecsHint">Add any details about cleaning, moisture,
+              sorting, or packaging:</div>
+            <div class="dash-modal__field">
+              <label for="wiz-desc-input" class="dash-field-label" data-i18n="wizard.descPackaging">Description /
+                Moisture / Packaging Notes</label>
+              <textarea id="wiz-desc-input" class="dash-form-textarea" rows="3"
+                placeholder="e.g. Machine cleaned and sorted, packed in 50 kg gunny bags, moisture under 11%, pesticide-free farm produce.">Freshly harvested, machine-cleaned, and carefully sorted. Ready for dispatch.</textarea>
+              <input type="hidden" id="lot-desc-input" value="Fresh harvest, machine cleaned and sorted Grade A lot.">
+            </div>
+          </div>
+
+          <!-- Step 8: Review & Publish -->
+          <div class="lot-wizard-pane" id="wizard-pane-8">
+            <div class="lot-step-prompt" data-i18n="wizard.reviewLot">Review Your Crop Lot</div>
+            <div class="lot-step-hint" data-i18n="wizard.reviewLotHint">Confirm all details before publishing to
+              verified institutional buyers:</div>
+            <div class="lot-wizard-preview-card" id="wiz-summary-preview">
+              <!-- Rendered dynamically by renderWizardSummary() -->
+            </div>
+            <div class="lot-publish-guarantee">
+              <i data-lucide="shield-check" style="width: 16px; height: 16px; color: #2E7D32; flex-shrink: 0;"></i>
+              <span><strong>Kisan Protection:</strong> 100% Escrow deposit required by buyer before loading. Verified
+                weight and prompt settlement.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fixed Footer Actions -->
+        <div class="lot-wizard-footer">
+          <button type="button" class="btn btn--secondary" id="wiz-btn-prev" style="visibility: hidden;">
+            <i data-lucide="arrow-left" style="width: 14px; height: 14px;"></i> <span
+              data-i18n="common.back">Back</span>
+          </button>
+          <div class="lot-wizard-footer-right">
+            <button type="button" class="btn btn--primary" id="wiz-btn-next">
+              <span data-i18n="common.continue">Continue</span> <i data-lucide="arrow-right"
+                style="width: 14px; height: 14px;"></i>
+            </button>
+            <button type="submit" class="btn btn--gold" id="wiz-btn-publish" style="display: none;">
+              <i data-lucide="check-circle-2" style="width: 16px; height: 16px;"></i> <span
+                data-i18n="wizard.publishLot">Publish Crop Lot</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. STORAGE NEAR YOU MODAL (Warehouse & Cold Storage Discovery) -->
+  <div class="dash-modal-overlay" id="storage-modal-overlay">
+    <div class="dash-modal dash-modal--lg" id="storage-modal" style="max-width: 780px;">
+      <div class="dash-modal__header">
+        <div>
+          <h3>🏢 Storage Facilities & Cold Warehouses</h3>
+          <span class="dash-crop-modal__sub">Prevent forced distress selling by storing produce at negotiable warehouse
+            receipt (NWR) facilities</span>
+        </div>
+        <button class="dash-modal__close" id="storage-modal-close"><i data-lucide="x"></i></button>
+      </div>
+      <div class="dash-modal__body-pad">
+        <div
+          style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+          <input type="text" id="storage-search-input" class="dash-form-input" style="max-width:280px;"
+            placeholder="Search by district or crop...">
+          <div style="font-size:12px; color:var(--ks-text-muted);">Showing 4 verified facilities in Maharashtra</div>
+        </div>
+        <div class="storage-grid" id="storage-modal-grid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. STORAGE BOOKING CONFIRMATION MODAL -->
+  <div class="dash-modal-overlay" id="storage-booking-modal-overlay">
+    <div class="dash-modal dash-modal--sm" id="storage-booking-modal">
+      <div class="dash-modal__header">
+        <h3>Book Storage Space</h3>
+        <button class="dash-modal__close" id="storage-booking-modal-close"><i data-lucide="x"></i></button>
+      </div>
+      <form class="dash-modal__form" id="storage-booking-form">
+        <div class="dash-modal__field">
+          <label>Facility</label>
+          <input type="text" id="sb-facility-name" class="dash-form-input" readonly>
+        </div>
+        <div class="dash-form-row">
+          <div class="dash-modal__field">
+            <label for="sb-crop-select">Crop</label>
+            <select id="sb-crop-select" class="dash-filter-select">
+              <option value="Tomato">Tomato</option>
+              <option value="Onion">Onion</option>
+              <option value="Rice">Rice</option>
+              <option value="Wheat">Wheat</option>
+              <option value="Soybean">Soybean</option>
+              <option value="Potato">Potato</option>
+            </select>
+          </div>
+          <div class="dash-modal__field">
+            <label for="sb-qty-input">Quantity (Tonnes)</label>
+            <input type="number" id="sb-qty-input" class="dash-form-input" value="5" min="1" max="100" required>
+          </div>
+        </div>
+        <div class="dash-modal__field">
+          <label for="sb-duration-days">Duration (Days)</label>
+          <input type="number" id="sb-duration-days" class="dash-form-input" value="14" min="1" max="180" required>
+        </div>
+        <div id="sb-cost-summary"
+          style="background:#FAF9F5; border:1px solid #E2E0D5; border-radius:8px; padding:10px 12px; font-size:13px; margin-bottom:12px;">
+          Estimated Total Cost: <strong>₹1,750</strong> (₹2.5/kg/day)
+        </div>
+        <button type="submit" class="btn btn--primary dash-modal__submit"><i data-lucide="check"></i> Confirm
+          Reservation</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. ARRANGE TRANSPORT MODAL -->
+  <div class="dash-modal-overlay" id="transport-modal-overlay">
+    <div class="dash-modal dash-modal--lg" id="transport-modal" style="max-width: 780px;">
+      <div class="dash-modal__header">
+        <div>
+          <h3>🚚 Arrange Farm Gate Transport</h3>
+          <span class="dash-crop-modal__sub">Verified agri-logistics drivers with transparent per-km rates</span>
+        </div>
+        <button class="dash-modal__close" id="transport-modal-close"><i data-lucide="x"></i></button>
+      </div>
+      <div class="dash-modal__body-pad">
+        <div class="transport-grid" id="transport-modal-grid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. KISAN HELP & DISPUTES / GRIEVANCE MODAL -->
+  <div class="dash-modal-overlay" id="disputes-modal-overlay">
+    <div class="dash-modal dash-modal--lg" id="disputes-modal" style="max-width: 720px;">
+      <div class="dash-modal__header">
+        <div>
+          <h3>🛡️ Kisan Grievance & Dispute Redressal</h3>
+          <span class="dash-crop-modal__sub">Raise and track issues regarding payments, quality, or transport</span>
+        </div>
+        <button class="dash-modal__close" id="disputes-modal-close"><i data-lucide="x"></i></button>
+      </div>
+      <div class="dash-modal__body-pad">
+        <!-- Tabs -->
+        <div style="display:flex; gap:10px; border-bottom:1px solid #E2E0D5; padding-bottom:10px; margin-bottom:16px;">
+          <button type="button" class="btn btn--sm btn--primary" id="tab-dispute-raise"
+            onclick="switchDisputeTab('raise')">+ Raise New Complaint</button>
+          <button type="button" class="btn btn--sm btn--secondary" id="tab-dispute-history"
+            onclick="switchDisputeTab('history')">My Active Disputes (<span id="dispute-count-badge">1</span>)</button>
+        </div>
+
+        <!-- Tab 1: Raise Dispute Form -->
+        <div id="dispute-pane-raise">
+          <form class="dash-modal__form" id="dispute-form">
+            <div class="dash-modal__field">
+              <label for="disp-trx-select">Select Order / Transaction</label>
+              <select id="disp-trx-select" class="dash-filter-select" required>
+                <option value="KS-ORD-2026-000102">KS-ORD-2026-000102 · Rice (25q) · ABC Foods Ltd (₹71,250)</option>
+                <option value="KS-ORD-2026-000098">KS-ORD-2026-000098 · Onion (12q) · Reliance Fresh (₹34,200)</option>
+                <option value="General Inquiry">General / Non-Order Grievance</option>
+              </select>
+            </div>
+
+            <div class="dash-modal__field">
+              <label for="disp-reason-select">Complaint Category</label>
+              <select id="disp-reason-select" class="dash-filter-select" required>
+                <option value="Payment not received">Payment not received / Delay past 24 hours</option>
+                <option value="Quantity mismatch">Quantity mismatch at delivery weighbridge</option>
+                <option value="Quality disagreement">Quality / Grading deduction disagreement</option>
+                <option value="Buyer cancelled order">Buyer cancelled after dispatch</option>
+                <option value="Transport issue">Transport delay / Truck no-show</option>
+                <option value="Damaged goods">Produce damaged during transit</option>
+                <option value="Incorrect offer">Incorrect offer settlement amount</option>
+                <option value="Other">Other grievance</option>
+              </select>
+            </div>
+
+            <div class="dash-modal__field">
+              <label for="disp-desc-input">Describe the Issue in Detail</label>
+              <textarea id="disp-desc-input" class="dash-form-textarea" rows="3"
+                placeholder="Please provide specific details including dates, weighment slip numbers, and communication with the buyer."
+                required></textarea>
+            </div>
+
+            <div class="dash-modal__field">
+              <label for="disp-file-input">Upload Supporting Receipt / Weighment Slip / Photo (Optional)</label>
+              <input type="file" id="disp-file-input" class="dash-form-input" accept="image/*,.pdf">
+            </div>
+
+            <button type="submit" class="btn btn--primary dash-modal__submit"><i data-lucide="send"></i> Submit Dispute
+              Ticket</button>
+          </form>
+        </div>
+
+        <!-- Tab 2: Dispute History Tracker -->
+        <div id="dispute-pane-history" style="display:none;">
+          <div id="dispute-history-list">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POST-LISTING GUIDANCE MODAL (Section 7: Smart Guidance after listing) -->
+  <div class="dash-modal-overlay" id="post-listing-modal-overlay">
+    <div class="dash-modal dash-modal--sm" id="post-listing-modal" style="text-align:center;">
+      <div class="dash-modal__header" style="justify-content:flex-end;">
+        <button class="dash-modal__close" onclick="closeModal('post-listing-modal-overlay')"><i
+            data-lucide="x"></i></button>
+      </div>
+      <div class="dash-modal__body-pad" style="padding-top:0;">
+        <div style="font-size:48px; margin-bottom:8px;">🎉</div>
+        <h3 style="font-size:22px; font-weight:800; color:var(--ks-evergreen); margin-bottom:4px;">Your Crop is Ready to
+          Sell! ✓</h3>
+        <p style="font-size:13px; color:#666; margin-bottom:18px;">Your lot has been listed across the KhetSetu
+          network.</p>
+
+        <div
+          style="background:#F5F4ED; border:1px solid #E5E4DD; border-radius:12px; padding:16px; margin-bottom:20px; text-align:left;">
+          <div
+            style="font-size:12px; font-weight:700; color:var(--ks-evergreen); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:10px;">
+            ✨ Automatically Found for Your Listing:
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <div
+              style="background:#FFFFFF; padding:10px; border-radius:8px; border:1px solid #EAE8DC; display:flex; align-items:center; gap:8px;">
+              <span style="font-size:20px;">🤝</span>
+              <div>
+                <strong style="font-size:15px; color:#12372A;">5 Buyers</strong>
+                <div style="font-size:11px; color:#777;">Interested today</div>
+              </div>
+            </div>
+            <div
+              style="background:#FFFFFF; padding:10px; border-radius:8px; border:1px solid #EAE8DC; display:flex; align-items:center; gap:8px;">
+              <span style="font-size:20px;">📍</span>
+              <div>
+                <strong style="font-size:15px; color:#12372A;">3 Mandis</strong>
+                <div style="font-size:11px; color:#777;">High prices near you</div>
+              </div>
+            </div>
+            <div
+              style="background:#FFFFFF; padding:10px; border-radius:8px; border:1px solid #EAE8DC; display:flex; align-items:center; gap:8px;">
+              <span style="font-size:20px;">🚚</span>
+              <div>
+                <strong style="font-size:15px; color:#12372A;">2 Transports</strong>
+                <div style="font-size:11px; color:#777;">Ready for pickup</div>
+              </div>
+            </div>
+            <div
+              style="background:#FFFFFF; padding:10px; border-radius:8px; border:1px solid #EAE8DC; display:flex; align-items:center; gap:8px;">
+              <span style="font-size:20px;">🏢</span>
+              <div>
+                <strong style="font-size:15px; color:#12372A;">1 Cold Storage</strong>
+                <div style="font-size:11px; color:#777;">Available 8 km</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <button class="btn btn--primary" style="width:100%; background:var(--ks-evergreen); color:#FFFFFF;"
+            onclick="closeModal('post-listing-modal-overlay'); location.href='buyers.html';">
+            <i data-lucide="users"></i> See Best Buyers (5 Matched)
+          </button>
+          <button class="btn btn--secondary" style="width:100%;"
+            onclick="closeModal('post-listing-modal-overlay'); location.href='mandi-compare.html';">
+            <i data-lucide="bar-chart-2"></i> Compare Mandi Prices
+          </button>
+          <button class="btn btn--secondary" style="width:100%;"
+            onclick="closeModal('post-listing-modal-overlay'); openTransportModal();">
+            <i data-lucide="truck"></i> Arrange Transport
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATIONS MODAL -->
+  <div class="dash-modal-overlay" id="notifications-modal-overlay">
+    <div class="dash-modal dash-modal--sm" id="notifications-modal">
+      <div class="dash-modal__header">
+        <div>
+          <h3>Notifications</h3>
+          <span class="dash-crop-modal__sub">Real-time alerts & buyer messages</span>
+        </div>
+        <button class="dash-modal__close" id="notifications-modal-close"><i data-lucide="x"></i></button>
+      </div>
+      <div class="dash-modal__body-pad" id="notifications-list"></div>
+    </div>
+  </div>
+
+  <!-- PROFILE MODAL -->
+  <div class="dash-modal-overlay" id="profile-modal-overlay">
+    <div class="dash-modal" id="profile-modal" style="max-width: 480px;">
+      <div class="dash-modal__header">
+        <h3>My Profile & Account Settings</h3>
+        <button class="dash-modal__close" id="profile-modal-close"><i data-lucide="x"></i></button>
+      </div>
+
+      <div class="dash-modal__body-pad" style="max-height: 80vh; overflow-y: auto;">
+        <!-- User Info Badge Card -->
+        <div class="dash-profile-badge-card">
+          <div class="dash-profile-badge-card__avatar" id="modal-avatar">R</div>
+          <div class="dash-profile-badge-card__meta">
+            <div class="dash-profile-badge-card__name" id="modal-user-name">Farmer</div>
+            <div class="dash-profile-badge-card__email" id="modal-user-email">user@example.com</div>
+            <div class="dash-profile-badge-card__tags">
+              <span class="dash-profile-tag dash-profile-tag--role" id="modal-user-role">FARMER</span>
+              <span class="dash-profile-tag dash-profile-tag--verified" id="modal-user-verified">✓ VERIFIED</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 1: Edit Profile -->
+        <form class="dash-modal__form" id="profile-form">
+          <h4 style="font-size: 14px; font-weight: 700; color: var(--ks-evergreen); margin-bottom: 10px;">Personal
+            Information</h4>
+          <div id="profile-alert" class="dash-modal-alert"></div>
+
+          <div class="dash-modal__field">
+            <label for="prof-name">Full Name</label>
+            <input type="text" id="prof-name" class="dash-form-input" placeholder="Your Full Name" required>
+          </div>
+
+          <div class="dash-modal__field">
+            <label for="prof-phone">Mobile Number (10 digits)</label>
+            <input type="tel" id="prof-phone" class="dash-form-input" placeholder="9876543210" maxlength="10">
+          </div>
+
+          <button type="submit" class="btn btn--primary dash-modal__submit" id="btn-save-profile">
+            <i data-lucide="save"></i> Save Profile
+          </button>
+        </form>
+
+        <hr class="dash-profile-divider">
+
+        <!-- Section 2: Change Password -->
+        <form class="dash-modal__form" id="password-form">
+          <h4 style="font-size: 14px; font-weight: 700; color: var(--ks-evergreen); margin-bottom: 10px;">Change
+            Password</h4>
+          <div id="password-alert" class="dash-modal-alert"></div>
+
+          <div class="dash-modal__field">
+            <label for="prof-current-pass">Current Password</label>
+            <input type="password" id="prof-current-pass" class="dash-form-input" placeholder="••••••••" required>
+          </div>
+
+          <div class="dash-modal__field">
+            <label for="prof-new-pass">New Password</label>
+            <input type="password" id="prof-new-pass" class="dash-form-input" placeholder="•••••••• (Min 6 characters)"
+              minlength="6" required>
+          </div>
+
+          <button type="submit" class="btn btn--secondary dash-modal__submit" id="btn-save-password"
+            style="width: 100%;">
+            <i data-lucide="lock"></i> Update Password
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- KISAN HELPLINE MODAL -->
+  <div class="dash-modal-overlay" id="help-modal-overlay">
+    <div class="dash-modal" id="help-modal">
+      <div class="dash-modal__header">
+        <h3 data-i18n="farmer.kisanSupportTitle">Kisan Support & Helpline</h3>
+        <button class="dash-modal__close" id="help-modal-close"><i data-lucide="x"></i></button>
+      </div>
+      <div class="dash-modal__body-pad">
+        <div class="dash-help-banner">
+          <i data-lucide="phone-call"></i>
+          <div>
+            <div style="font-weight:700; color:var(--ks-evergreen);" data-i18n="farmer.kisanCallCenterTollFree">Kisan
+              Call Center (Toll Free)</div>
+            <div style="font-size:18px; font-weight:800; color:var(--ks-sage);">1800-180-1551</div>
+            <div style="font-size:11px; color:var(--ks-text-muted);" data-i18n="farmer.availableHours">Available 6:00 AM
+              to 10:00 PM all 7 days</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- MANDI FULL DETAILS MODAL -->
+  <div class="dash-modal-overlay" id="mandi-details-modal-overlay">
+    <div class="dash-modal dash-modal--lg" id="mandi-details-modal">
+      <div class="dash-modal__header">
+        <div>
+          <div class="mandi-modal-title-row" style="display:flex; align-items:center; gap:8px;">
+            <h3 id="mandi-modal-name">Pune APMC</h3>
+            <span class="mandi-modal-status-badge" id="mandi-modal-status"
+              style="font-size:11px; padding:2px 8px; border-radius:6px; background:#eaf6ed; color:#5b9a72; font-weight:700;">🟢
+              Open</span>
+          </div>
+          <span class="dash-crop-modal__sub" id="mandi-modal-location"
+            style="font-size:12px; color:var(--ks-text-muted);">Market Yard, Gultekdi, Pune · Maharashtra</span>
+        </div>
+        <button class="dash-modal__close" id="mandi-details-modal-close"><i data-lucide="x"></i></button>
+      </div>
+      <div class="dash-modal__body-pad" id="mandi-details-modal-body">
+        <!-- Rendered dynamically by mandi-map.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- LIVE CAMERA CAPTURE MODAL -->
+  <div class="dash-modal-overlay" id="qe-camera-modal-overlay" style="display: none; z-index: 10000; align-items: center; justify-content: center;">
+    <div class="dash-modal" style="max-width: 480px; width: 92%; padding: 20px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 20px 40px rgba(0,0,0,0.25); position: relative;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #12372A; display: flex; align-items: center; gap: 8px;">
+          📷 Take a photo
+        </h3>
+        <button type="button" class="dash-modal__close" onclick="FarmerFlow.closeCameraModal()" aria-label="Close" style="border: none; background: transparent; cursor: pointer; font-size: 18px; padding: 4px; color: #666;">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <!-- Live Video / Error Box -->
+      <div id="qe-camera-view-wrap" style="position: relative; width: 100%; height: 280px; background: #000000; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+        <video id="qe-camera-video" playsinline autoplay muted style="width: 100%; height: 100%; object-fit: cover;"></video>
+        
+        <!-- Camera Error fallback inside modal -->
+        <div id="qe-camera-error-box" style="display: none; padding: 20px; text-align: center; color: #FFFFFF; width: 100%;">
+          <div style="font-size: 28px; margin-bottom: 8px;">📷</div>
+          <div style="font-size: 14px; font-weight: 700; margin-bottom: 4px;">Camera access isn't available</div>
+          <div style="font-size: 12px; color: #CCCCCC; margin-bottom: 16px; line-height: 1.4;">
+            Please allow camera access or choose a photo from your device.
+          </div>
+          <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+            <button type="button" class="btn btn--primary btn--sm" onclick="FarmerFlow.startCameraStream()" style="font-weight: 700; padding: 8px 14px;">
+              Try camera again
+            </button>
+            <button type="button" class="btn btn--secondary btn--sm" onclick="FarmerFlow.closeCameraModal(); document.getElementById('qe-photo-upload').click();" style="padding: 8px 14px; background: #FFFFFF; color: #12372A;">
+              Choose a photo
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size: 12px; color: #555555; text-align: center; margin-bottom: 16px; line-height: 1.4;">
+        Position the produce clearly inside the frame.
+      </div>
+
+      <!-- Modal Action Buttons -->
+      <div id="qe-camera-actions" style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+        <button type="button" class="btn btn--secondary btn--sm" onclick="FarmerFlow.closeCameraModal()" style="padding: 10px 18px; font-weight: 600;">
+          Cancel
+        </button>
+        <button type="button" class="btn btn--primary btn--sm" onclick="FarmerFlow.captureCameraPhoto()" style="flex: 1; padding: 10px 18px; font-weight: 800; font-size: 13.5px;">
+          📸 Capture photo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Multilingual Support (Farmer) -->
+  <script src="js/translations.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/demo-data.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/page-guard.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/mandi-price-snapshot.js"></script>
+  <script src="js/mandi-map.js"></script>
+  <script src="js/grading-engine.js"></script>
+  <script src="js/farmer.js"></script>
+  <script src="js/dashboard.js"></script>
+  <!-- Krishi Sahayak AI Market Assistant -->
+  <script src="js/krishi-sahayak.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transporter Profile & Operating Preferences | KhetSetu</title>
+  <meta name="description" content="Manage your commercial logistics business profile, verified contacts, operating corridors, fleet summary, and settlement accounts.">
+  
+  <!-- Google Fonts: Outfit + Playfair Display + Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="css/transporter.css">
+</head>
+<body data-require-role="transporter">
+
+  <!-- =========================================================================
+       HEADER & NAVIGATION BAR
+       ========================================================================= -->
+  <header class="trans-header">
+    <div class="trans-header-inner">
+      <a href="dashboard.html" class="trans-brand">
+        <div class="brand-icon-box"><i data-lucide="sprout"></i></div>
+        <span class="trans-brand-text">
+          Krishi<span>Shetra</span>
+          <span class="trans-brand-badge">Transporter Hub</span>
+        </span>
+      </a>
+
+      <nav>
+        <ul class="trans-nav-menu" id="transNavMenu">
+          <li><a href="dashboard.html" class="trans-nav-link"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+          <li><a href="available-loads.html" class="trans-nav-link"><i data-lucide="package-search"></i> Available Loads</a></li>
+          <li><a href="active-trips.html" class="trans-nav-link"><i data-lucide="truck"></i> Active Trips</a></li>
+          <li><a href="fleet.html" class="trans-nav-link"><i data-lucide="shield-check"></i> Fleet</a></li>
+          <li><a href="drivers.html" class="trans-nav-link"><i data-lucide="users"></i> Drivers</a></li>
+          <li><a href="earnings.html" class="trans-nav-link"><i data-lucide="wallet"></i> Earnings</a></li>
+          <li><a href="profile.html" class="trans-nav-link active"><i data-lucide="user-check"></i> Profile</a></li>
+          <li class="trans-mobile-logout"><a href="javascript:void(0)" class="trans-nav-link trans-nav-link--danger" onclick="if(window.Auth&&typeof window.Auth.logout==='function'){window.Auth.logout();}else{localStorage.clear();window.location.href='../login.html';}"><i data-lucide="log-out"></i> Logout / Sign Out</a></li>
+        </ul>
+      </nav>
+
+      <div class="trans-header-actions">
+        <a href="../index.html" class="portal-switch-btn" title="Go to FPO Dashboard">
+          <i data-lucide="repeat" style="width:14px;height:14px;"></i> FPO Hub
+        </a>
+
+        <button class="trans-btn-icon" title="Notifications" onclick="showToast('Your carrier profile is 100% verified!')">
+          <i data-lucide="bell" style="width:18px;height:18px;"></i>
+          <span class="trans-notif-dot"></span>
+        </button>
+
+        <div class="trans-profile-wrap" id="transProfileWrap">
+          <button type="button" class="trans-user-pill" id="btnTransProfile" aria-expanded="false" aria-haspopup="true" aria-label="Transporter profile menu">
+            <div class="trans-user-avatar" id="transHeaderAvatar">KE</div>
+            <div class="trans-user-info">
+              <span class="trans-user-name" id="transHeaderName">Kisan Express</span>
+              <span class="trans-user-role">Gold Carrier ✓</span>
+            </div>
+            <i data-lucide="chevron-down" class="trans-user-chevron"></i>
+          </button>
+
+          <div class="trans-profile-dropdown" id="transProfileDropdown" role="menu">
+            <div class="trans-dropdown-header">
+              <div class="trans-user-avatar" style="width:38px;height:38px;font-size:14px;" id="transDropdownAvatar">KE</div>
+              <div style="overflow:hidden;">
+                <div class="trans-dropdown-name" id="transDropdownName">Kisan Express Logistics</div>
+                <div class="trans-dropdown-sub" id="transDropdownSub">Gold Carrier · VAHAN Verified</div>
+              </div>
+            </div>
+            <div class="trans-dropdown-sep"></div>
+            <a href="profile.html" class="trans-dropdown-item" role="menuitem"><i data-lucide="user-check"></i> Profile & Fleet Info</a>
+            <a href="onboarding.html" class="trans-dropdown-item" role="menuitem"><i data-lucide="shield-check"></i> Compliance & Permits</a>
+            <a href="earnings.html" class="trans-dropdown-item" role="menuitem"><i data-lucide="wallet"></i> FASTag & Earnings</a>
+            <div class="trans-dropdown-sep"></div>
+            <a href="javascript:void(0)" class="trans-dropdown-item trans-dropdown-item--danger" id="transLogoutBtn" role="menuitem"><i data-lucide="log-out"></i> Logout / Sign Out</a>
+          </div>
+        </div>
+
+        <button class="trans-hamburger" id="transHamburger" aria-label="Toggle navigation menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       MAIN CONTENT CONTAINER
+       ========================================================================= -->
+  <main class="trans-main">
+    <div class="trans-container" style="max-width:1080px;">
+
+      <!-- Header & Verification Badge Hero -->
+      <div class="card-panel" style="padding:24px;margin-bottom:24px;background:#FAFDFB;border-color:#A7F3D0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px;">
+          <div style="display:flex;gap:16px;align-items:center;">
+            <div class="trans-user-avatar" style="width:64px;height:64px;font-size:24px;background:var(--transporter-primary);color:var(--transporter-accent);box-shadow:var(--shadow-sm);">
+              KE
+            </div>
+            <div>
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <h1 style="font-size:22px;font-weight:800;color:var(--transporter-text);margin:0;">Transporter Profile</h1>
+                <span class="status-badge available">Gold Carrier Tier ✓</span>
+              </div>
+              <p style="color:var(--transporter-muted);font-size:13.5px;margin-top:3px;">
+                Entity: <strong>Kisan Express Logistics Pvt Ltd</strong> · ID: <code>TR-MH-8902</code> · Nashik, Maharashtra
+              </p>
+              <div style="display:flex;gap:14px;font-size:12px;color:var(--transporter-text);margin-top:6px;font-weight:600;flex-wrap:wrap;">
+                <span>★ 4.90 Rating</span>
+                <span>• 486 Trips Done</span>
+                <span>• 97.8% On-Time SLA</span>
+                <span>• 14 Trucks AIS-140 GPS</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <a href="onboarding.html" class="btn btn-amber"><i data-lucide="shield-check"></i> Compliance Center</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Clean Form Sections -->
+      <div class="dashboard-grid-2" style="gap:20px;">
+        
+        <!-- Section 1 & 2: Business & Contact Details -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          
+          <!-- 1. Business Details -->
+          <div class="card-panel" style="padding:22px;margin-bottom:0;">
+            <div class="panel-header" style="margin-bottom:14px;">
+              <div class="panel-title-wrap">
+                <div class="panel-icon-box"><i data-lucide="building-2"></i></div>
+                <div>
+                  <h3 class="panel-title" style="font-size:16px;">1. Business Details</h3>
+                  <div class="panel-subtitle">Official commercial registration info</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:12px;">
+              <label class="form-label">Business Registered Name</label>
+              <input type="text" class="form-input" id="profBizName" value="Kisan Express Logistics Pvt Ltd">
+            </div>
+
+            <div class="form-grid-2" style="margin-bottom:12px;">
+              <div class="form-group">
+                <label class="form-label">GSTIN (Goods Transport Agency)</label>
+                <input type="text" class="form-input" value="27AAECK1298P1Z8" readonly style="background:var(--transporter-surface-warm);">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Company PAN</label>
+                <input type="text" class="form-input" value="AAECK1298P" readonly style="background:var(--transporter-surface-warm);">
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Contact Details -->
+          <div class="card-panel" style="padding:22px;margin-bottom:0;">
+            <div class="panel-header" style="margin-bottom:14px;">
+              <div class="panel-title-wrap">
+                <div class="panel-icon-box"><i data-lucide="phone"></i></div>
+                <div>
+                  <h3 class="panel-title" style="font-size:16px;">2. Contact Information</h3>
+                  <div class="panel-subtitle">Dispatch & emergency contact numbers</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-grid-2" style="margin-bottom:12px;">
+              <div class="form-group">
+                <label class="form-label">Primary Dispatch Phone</label>
+                <input type="tel" class="form-input" id="profPhone" value="+91 98230 45891">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Operations Email</label>
+                <input type="email" class="form-input" id="profEmail" value="ops@kisanexpress.in">
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:14px;">
+              <label class="form-label">Fleet Operating Headquarters</label>
+              <input type="text" class="form-input" value="Plot 18, Transport Nagar, Dwarka Circle, Nashik, Maharashtra 422011">
+            </div>
+
+            <button class="btn btn-primary btn-sm" onclick="saveProfileChanges()"><i data-lucide="check"></i> Save Changes</button>
+          </div>
+
+        </div>
+
+        <!-- Section 3, 4 & 5: Service Areas, Fleet Summary & Account Settings -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          
+          <!-- 3. Service Areas / Corridors -->
+          <div class="card-panel" style="padding:22px;margin-bottom:0;">
+            <div class="panel-header" style="margin-bottom:12px;">
+              <div class="panel-title-wrap">
+                <div class="panel-icon-box" style="background:#FEF3C7;color:#B45309;"><i data-lucide="map-pin"></i></div>
+                <div>
+                  <h3 class="panel-title" style="font-size:16px;">3. Service Areas & Corridors</h3>
+                  <div class="panel-subtitle">Preferred transit corridors for urgent loads</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="padding:8px 12px;background:var(--transporter-surface-warm);border-radius:var(--radius-sm);border:1px solid var(--transporter-border-subtle);display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:700;">
+                <span>🧅 Nashik Mandi ➔ Vashi APMC (Mumbai)</span>
+                <span class="status-badge available" style="font-size:11px;">Active</span>
+              </div>
+              <div style="padding:8px 12px;background:var(--transporter-surface-warm);border-radius:var(--radius-sm);border:1px solid var(--transporter-border-subtle);display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:700;">
+                <span>🍎 Sopore / Srinagar ➔ Pune Cold-Chain</span>
+                <span class="status-badge in-transit" style="font-size:11px;">Active (Reefer)</span>
+              </div>
+              <div style="padding:8px 12px;background:var(--transporter-surface-warm);border-radius:var(--radius-sm);border:1px solid var(--transporter-border-subtle);display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:700;">
+                <span>🌾 MP Malwa Mandi ➔ Surat / Ahmedabad</span>
+                <span class="status-badge available" style="font-size:11px;">Active</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Vehicle & Fleet Summary -->
+          <div class="card-panel" style="padding:22px;margin-bottom:0;">
+            <div class="panel-header" style="margin-bottom:12px;">
+              <div class="panel-title-wrap">
+                <div class="panel-icon-box" style="background:#E0F2FE;color:#0284C7;"><i data-lucide="truck"></i></div>
+                <div>
+                  <h3 class="panel-title" style="font-size:16px;">4. Vehicle & Fleet Summary</h3>
+                  <div class="panel-subtitle">Capacity and fleet readiness snapshot</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:8px;background:var(--transporter-surface);padding:10px;border-radius:var(--radius-sm);text-align:center;">
+              <div>
+                <div style="font-size:10.5px;color:var(--transporter-muted);font-weight:700;">TRUCKS</div>
+                <div style="font-size:16px;font-weight:800;color:var(--transporter-primary);margin-top:2px;">14</div>
+              </div>
+              <div>
+                <div style="font-size:10.5px;color:var(--transporter-muted);font-weight:700;">DRIVERS</div>
+                <div style="font-size:16px;font-weight:800;color:var(--transporter-primary);margin-top:2px;">12</div>
+              </div>
+              <div>
+                <div style="font-size:10.5px;color:var(--transporter-muted);font-weight:700;">CAPACITY</div>
+                <div style="font-size:16px;font-weight:800;color:var(--transporter-text);margin-top:2px;">218 MT</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Account Settings & Escrow Settlement -->
+          <div class="card-panel" style="padding:22px;margin-bottom:0;">
+            <div class="panel-header" style="margin-bottom:12px;">
+              <div class="panel-title-wrap">
+                <div class="panel-icon-box" style="background:#E8F7F0;color:#0B6B46;"><i data-lucide="wallet"></i></div>
+                <div>
+                  <h3 class="panel-title" style="font-size:16px;">5. Escrow Bank Account</h3>
+                  <div class="panel-subtitle">Direct payout settlement details</div>
+                </div>
+              </div>
+            </div>
+            
+            <div style="background:var(--transporter-surface-warm);padding:12px 14px;border-radius:var(--radius-sm);border:1px solid var(--transporter-border-subtle);font-size:12.5px;">
+              <div style="font-weight:800;color:var(--transporter-text);">HDFC Bank (Nashik City Branch)</div>
+              <div style="color:var(--transporter-muted);margin-top:2px;">A/C: <code>50200049281729</code> · IFSC: <code>HDFC0001048</code></div>
+              <div style="color:var(--transporter-primary);font-weight:600;margin-top:4px;">UPI: <code>kisanlogistics@hdfcbank</code> (Instant IMPS Active)</div>
+            </div>
+
+            <div style="margin-top:12px;display:flex;gap:8px;">
+              <a href="earnings.html" class="btn btn-amber btn-sm"><i data-lucide="arrow-up-right"></i> View Escrow Wallet</a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       FOOTER
+       ========================================================================= -->
+  <footer class="trans-footer">
+    <div class="trans-container trans-footer-inner">
+      <div>© 2026 KhetSetu Agri-Logistics Infrastructure Ltd. · VAHAN & Sarathi Integrated</div>
+      <div style="display:flex;gap:16px;">
+        <a href="onboarding.html">Compliance & Permits</a>
+        <a href="earnings.html">FASTag Escrow</a>
+        <a href="profile.html">Carrier Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/page-guard.js"></script>
+  <script src="js/transporter-data.js"></script>
+  <script src="js/transporter.js"></script>
+  <script>
+    function saveProfileChanges() {
+      const name = document.getElementById('profBizName')?.value || 'Kisan Express';
+      showToast(`✅ Profile for "${name}" updated successfully!`, 'success');
+    }
+  </script>
+</body>
+</html>
