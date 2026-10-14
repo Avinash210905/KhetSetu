@@ -2,368 +2,238 @@
 
 # KrishiShetra — कृषि क्षेत्र
 
-**"Which mandi pays more?" → "Which mandi actually gives me more?"**
+**Market intelligence and digital trade workflows for India's agricultural community.**
 
-*A full-stack AgriTech platform giving Indian farmers transparent market intelligence, direct buyer access, and real price discovery — without middlemen.*
+KrishiShetra helps farmers compare mandi prices after estimated transport costs, publish produce lots, connect with buyers, and manage the steps from negotiation through delivery. Separate portals support buyers, Farmer Producer Organizations (FPOs), transporters, and administrators.
 
-[![Node.js](https://img.shields.io/badge/Node.js-v18+-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Express](https://img.shields.io/badge/Express-4.19-000000?logo=express&logoColor=white)](https://expressjs.com/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47A248?logo=mongodb&logoColor=white)](https://www.mongodb.com/)
-[![Multilingual](https://img.shields.io/badge/Multilingual-EN%20%7C%20HI%20%7C%20MR-blue)](#multilingual-support)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-
-[Problem](#the-problem) · [Solution](#our-solution) · [Features](#key-features) · [Architecture](#system-architecture) · [Setup](#getting-started) · [Demo](#demo)
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-4-000000?logo=express&logoColor=white)](https://expressjs.com/)
+[![MySQL](https://img.shields.io/badge/MySQL-8%2B-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![Languages](https://img.shields.io/badge/Languages-English%20%7C%20Hindi%20%7C%20Marathi-blue)](#multilingual-support)
 
 </div>
 
 ---
 
-## The Problem
+## What the project does
 
-Indian smallholder farmers — who produce over 50% of the country's food — sell most of their harvest to local intermediaries at prices well below what distant mandis or institutional buyers would pay. The core barriers are:
+Agricultural sellers often have to make decisions with incomplete information: which market offers the best return after freight, which buyers need their crop, and whether storage costs are justified by a possible later sale. KrishiShetra brings these workflows into one web platform.
 
-- **No price transparency** — farmers cannot compare real prices across mandis
-- **Transport cost blindness** — a higher mandi price can mean lower net income after freight
-- **No direct buyer access** — institutional buyers, food processors, and FPOs operate in a separate information world
-- **Paper-based disputes and no payment protection** — once produce leaves the farm, the farmer has little recourse
+A farmer can review market prices, compare estimated net realization across mandis, create a graded crop lot, respond to buyer offers, follow an order, request storage, or raise a dispute. Buyers can search available lots and negotiate. FPOs can coordinate member supply and help oversee trade issues. Transporters can find loads and manage trip milestones. Administrators can review users and platform activity.
 
-The farmer's real question is never "which mandi is cheapest?" — it is **"which mandi actually puts more money in my pocket after transport?"**
+The application is a project/hackathon implementation. Price projections, demo records, and workflow screens are decision-support and demonstration features; they do not guarantee future prices, payment, or transaction outcomes.
 
----
+## Main features and workflows
 
-## Our Solution
+### Farmer portal
 
-**KrishiShetra** is a role-based platform built for the full agricultural trade chain: farmers, institutional buyers, FPOs (Farmer Producer Organizations), transporters, and platform administrators.
+- Create and manage crop lots with crop, quantity, grade, harvest date, expected price, and location details.
+- Review buyer inquiries and offers, then accept, reject, or counter them.
+- Track orders and fulfillment status, view activity, and raise disputes.
+- Explore mandi prices and compare estimated proceeds after freight costs.
+- Review a sell-now versus store-and-hold estimate and submit storage or pledge-financing requests.
 
-It provides:
-- **Net margin price comparison** across 45+ APMC mandis — factoring in freight cost, not just modal price
-- **Direct lot-to-buyer marketplace** — farmers list standardized produce lots that verified buyers can discover and bid on
-- **Transparent multi-turn negotiation** — complete offer/counter-offer timeline with audit trail
-- **6-stage order lifecycle** from deal acceptance to delivery
-- **Multilingual UI** in English, Hindi, and Marathi so farmers can use the platform in their own language
+### Buyer portal
 
-The platform uses a **demo data fallback system** for local/offline demonstration and connects to live government mandi data (data.gov.in) and a MongoDB backend in production.
+- Search and filter public produce lots by crop and other listing details.
+- Save lots, send purchase inquiries, negotiate offers, and create orders from agreed deals.
 
----
+### FPO portal
 
-## Key Features
+- Coordinate member and pooled supply, monitor lots and trade activity, and participate in dispute workflows.
 
-### Farmer Portal
-- Create and publish standardized produce lots (`KS-YYYY-XXXXXX`) with grade, quantity, harvest date, and farm geolocation
-- View live and cached mandi prices across 45+ APMCs from the government data.gov.in dataset
-- Receive, accept, reject, or counter buyer purchase inquiries in real time
-- Track orders through a 6-stage fulfillment pipeline
-- Raise and manage trade disputes with FPO mediation support
-- Store produce with warehouse facilities and apply for pledge financing (Kisan Credit integration path)
+### Transporter portal
 
-### Mandi Price Intelligence
-- **Net margin arbitrage engine** — compares `modal price − estimated freight cost per quintal` across all available mandis for a selected crop
-- Automatically highlights the highest net-realization destination
-- Backed by the official [Agmarknet dataset](https://data.gov.in) refreshed daily
+- Find freight opportunities, accept/manage trips and driver assignments, and record delivery progress.
 
-### Buyer Command Center
-- Browse produce marketplace filtered by crop type, quality grade, organic status, region, and price range
-- Submit purchase inquiries with target price and required quantity
-- Multi-turn negotiation with timestamped offer history until mutual agreement
-- One-click order creation from accepted deal
+### Admin portal
 
-### FPO Collective Hub
-- Pool harvests from member farmers into commercial-scale bulk lots
-- Member farmer directory with acreage and seasonal yield tracking
-- Unified dispute mediation and order oversight
+- Review platform activity, user/KYC workflows, reports, and operational dashboards.
 
-### Transporter Logistics Portal
-- Discover available agricultural freight loads
-- Accept trips, manage driver assignments, and track delivery milestones
-- Earnings analytics per completed delivery
+### Market intelligence and quality tools
 
-### Admin Governance Suite
-- Platform-wide GMV, user counts, and active lot metrics
-- KYC verification queue for buyers and transporters
-- System health diagnostics
+- Fetch and normalize mandi price data from the Government of India's data.gov.in Agmarknet resource, with cached data used by the backend.
+- Estimate mandi net realization using price and freight assumptions.
+- The storage decision service compares estimated immediate proceeds with projected proceeds after storage, fees, and estimated crop weight loss. These projections are heuristic estimates.
+- An optional `ai-quality/` Python service contains image-based produce-quality inference and model training utilities. It is separate from the Node server and requires its own Python dependencies/model setup.
 
-### Multilingual Support
-Full UI in **English, Hindi (हिंदी), and Marathi (मराठी)** — every page, navigation element, status label, and form. Built on a custom i18n system (`js/translations.js` + `js/i18n.js`) — no third-party i18n library needed.
+### Multilingual support
 
----
+The frontend includes English, Hindi, and Marathi translations. Shared browser modules apply translations and persist the selected language.
 
-## User Roles & Journeys
+## How the application works
 
-| Role | Entry Point | Core Journey |
-|---|---|---|
-| **Farmer** | `dashboard.html` | Register farm → Create lot → Receive buyer inquiry → Negotiate → Fulfill order |
-| **Institutional Buyer** | `buyer.html` | Browse marketplace → Submit offer → Negotiate → Confirm order |
-| **FPO** | `fpo-dashboard.html` | Aggregate member lots → List bulk supply → Mediate disputes |
-| **Transporter** | `transporter/dashboard.html` | Discover freight loads → Accept trip → Deliver → Log earnings |
-| **Admin** | `admin/` | Verify users → Monitor platform health → Review disputes |
-
----
-
-## System Architecture
+1. The browser loads static HTML pages and their CSS/JavaScript modules. The Express server serves these files as well as the API.
+2. Login and registration pages call the authentication API. Passwords are hashed on the server; successful sign-in returns a JWT that the browser sends with protected API requests.
+3. Page guards check the active session and role. The API middleware verifies tokens and applies role checks to protected endpoints.
+4. Frontend feature modules use the shared API client to read or update lots, inquiries, offers, orders, storage requests, disputes, transport data, and notifications.
+5. Express route handlers call domain controllers and services. The MySQL compatibility/data layer creates tables from the model definitions when the server connects, then reads and writes application records in MySQL.
+6. Market services fetch data.gov.in prices when configured and keep cache data for reuse. A local demo-data module also provides sample data for selected frontend demo flows; it is not a replacement for backend persistence.
 
 ```mermaid
-graph TD
-    Browser["Browser — Farmer / Buyer / FPO / Transporter / Admin"]
-
-    Browser --> Guard["page-guard.js<br/>JWT validation + role enforcement"]
-    Guard --> Nav["navbar.js<br/>Role-aware navigation injection"]
-    Nav --> Controllers["Page Controllers<br/>dashboard.js · farmer.js · buyer-app.js<br/>mandi-compare.js · orders.js · disputes.js"]
-    Controllers --> API["js/api.js<br/>Centralized REST client<br/>Bearer JWT · 401 interceptor"]
-    API --> Express["Express REST API — /api/*<br/>server/server.js · Port 5000"]
-
-    Express --> AuthMW["Auth Middleware<br/>JWT verify + role guard"]
-    AuthMW --> RouteCtrl["Controllers<br/>auth · lot · inquiry · order<br/>market · storage · transport · dispute"]
-    RouteCtrl --> Mongoose["Mongoose ODM"]
-    Mongoose --> MongoDB[("MongoDB<br/>Users · ProduceLots · Inquiries<br/>Orders · StorageRequests · Disputes")]
-
-    Express --> MandiData["server/data/mandi_cache.json<br/>data.gov.in Agmarknet dataset<br/>Daily-refreshed official prices"]
-
-    i18n["js/i18n.js + translations.js<br/>EN · HI · MR language switcher"]
-    Browser --> i18n
+graph LR
+  Browser[HTML, CSS and JavaScript portals] -->|REST + JWT| Express[Node.js and Express API]
+  Express --> Auth[JWT authentication and role checks]
+  Express --> Services[Controllers and domain services]
+  Services --> MySQL[(MySQL database)]
+  Services --> Cache[Cached mandi price data]
+  Services --> GovData[data.gov.in Agmarknet API]
+  Browser --> I18n[English, Hindi and Marathi i18n]
 ```
 
----
+## Technology
 
-## Project Structure
-
-```
-KrishiShetra/
-├── index.html                    # Landing page
-├── dashboard.html                # Farmer dashboard
-├── lots.html                     # Produce lot management
-├── buyers.html                   # Buyer inquiry inbox (farmer view)
-├── market.html                   # Public produce marketplace
-├── mandi-compare.html            # Mandi price arbitrage engine
-├── ai-forecast.html              # Price forecast & harvest timing
-├── orders.html                   # Order tracking (6-stage stepper)
-├── storage.html                  # Storage & pledge financing
-├── disputes.html                 # Dispute & mediation center
-├── fpo-dashboard.html            # FPO collective portal
-├── buyer.html                    # Buyer marketplace & command center
-├── login.html / register.html    # Multi-role auth pages
-│
-├── css/
-│   ├── style.css                 # Landing page & shared design tokens
-│   ├── dashboard.css             # Shared farmer header & dashboard styles
-│   └── [page].css                # Per-page component styles
-│
-├── js/
-│   ├── api.js                    # Unified API client (Bearer JWT, error handling)
-│   ├── auth.js                   # Client auth state manager
-│   ├── i18n.js                   # Language switcher & DOM translation
-│   ├── translations.js           # All UI strings in EN / HI / MR
-│   ├── navbar.js                 # Role-aware navigation injector
-│   ├── page-guard.js             # Client-side route authentication
-│   ├── farmer.js                 # Lot management controller
-│   ├── dashboard.js              # Farmer dashboard controller
-│   ├── mandi-compare.js          # Price arbitrage & net margin calculator
-│   ├── mandi-map.js              # Leaflet APMC mandi map engine
-│   ├── orders.js                 # 6-stage order lifecycle
-│   ├── disputes.js               # Dispute & mediation UI
-│   ├── storage.js                # Storage booking & pledge UI
-│   └── grading-engine.js         # Produce quality grading logic
-│
-├── server/
-│   ├── server.js                 # Express entry point, CORS, middleware
-│   ├── config/db.js              # MongoDB / Mongoose connection
-│   ├── models/                   # Mongoose schemas
-│   │   ├── User.js · FarmerProfile.js · BuyerProfile.js
-│   │   ├── ProduceLot.js · Inquiry.js · Offer.js · Order.js
-│   │   ├── StorageFacility.js · StorageRequest.js · PledgeFinancingRequest.js
-│   │   ├── Dispute.js · Notification.js · TransportProfile.js
-│   │   └── ActivityLog.js · KYC.js · Payment.js · SavedLot.js
-│   ├── controllers/              # Business logic (one file per domain)
-│   ├── routes/                   # Express route registrations
-│   ├── middleware/               # JWT verify, role guard, error handler
-│   ├── services/                 # Brevo email delivery service
-│   └── data/mandi_cache.json     # Cached Agmarknet mandi prices
-│
-├── admin/                        # Admin governance suite
-├── transporter/                  # Transporter logistics portal
-├── assets/                       # Crop imagery & background photos
-├── .env.example                  # Environment variable template
-└── package.json                  # Node.js dependencies & scripts
-```
-
----
-
-## API Reference
-
-All routes are prefixed `/api`. Protected routes require `Authorization: Bearer <token>`.
-
-| Domain | Key Endpoints |
+| Area | Technology |
 |---|---|
-| **Auth** | `POST /api/auth/register` · `POST /api/auth/login` · `GET /api/auth/me` |
-| **Farmer** | `GET/POST/PUT /api/farmer/profile` |
-| **Lots** | `POST /api/lots` · `GET /api/lots/my` · `PUT /api/lots/:id` · `PUT /api/lots/:id/cancel` |
-| **Market** | `GET /api/market/lots` · `GET /api/market/lots/:id` |
-| **Inquiries** | `POST /api/inquiries` · `PUT /api/inquiries/:id/offer` · `PUT /api/inquiries/:id` |
-| **Orders** | `POST /api/orders` · `PUT /api/orders/:id/status` · `PUT /api/orders/:id/cancel` |
-| **Storage** | `GET /api/storage` · `POST /api/storage/requests` · `GET /api/storage/my-requests` |
-| **Disputes** | `POST /api/disputes` · `GET /api/disputes/my` · `PUT /api/disputes/:id` |
-| **Transport** | `GET /api/transport/loads` · `POST /api/transport/trips` · `PUT /api/transport/trips/:id` |
+| Frontend | HTML, CSS, vanilla JavaScript |
+| API server | Node.js 18+ and Express 4 |
+| Database | MySQL, accessed through `mysql2`; tables are initialized from `server/models/` by `server/db/mysql-compat.js` |
+| Authentication | JSON Web Tokens (`jsonwebtoken`) and `bcryptjs` password hashing |
+| Market prices | data.gov.in Agmarknet API and local/server cache |
+| Email | Brevo API (optional configuration) |
+| Quality inference | Separate optional Python/FastAPI service in `ai-quality/` |
+| Maps and charts | Leaflet and Chart.js on relevant pages |
 
----
+## Repository layout
 
-## Getting Started
-
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) v18+
-- [MongoDB](https://www.mongodb.com/) — local or [MongoDB Atlas](https://www.mongodb.com/atlas) free tier
-- Git
-
-### 1. Clone
-
-```bash
-git clone https://github.com/SurajMahto006/KrishiShetra.git
-cd KrishiShetra
+```text
+.
+├── index.html, login.html, register.html   Public and authentication pages
+├── dashboard.html, lots.html, ...          Farmer and shared portal pages
+├── buyer.html, buyers.html                 Buyer marketplace and related views
+├── fpo-dashboard.html                      FPO portal
+├── transporter/                            Transporter portal
+├── admin/                                   Admin portal
+├── css/                                     Shared and page-specific styles
+├── js/                                      API client, auth, page modules, i18n, demo data
+├── src/locales/                             Translation resources
+├── server/
+│   ├── server.js                            Express entry point and static hosting
+│   ├── routes/                              REST API route definitions
+│   ├── controllers/                         Request handling and business logic
+│   ├── services/                            Market, storage, email, audit and other services
+│   ├── models/                              Database entity definitions
+│   ├── db/mysql-compat.js                   MySQL model/data compatibility layer
+│   └── data/                                Cached market and location datasets
+├── ai-quality/                              Optional image-quality API and training tools
+├── assets/                                  Images and other static assets
+├── .env.example                             Backend environment template
+└── package.json                             Node scripts and dependencies
 ```
 
-### 2. Install dependencies
+## Getting started
+
+### Requirements
+
+- Node.js 18 or later and npm.
+- MySQL 8 (or a compatible MySQL server) and permission to create/use a database.
+- Git, if cloning the repository.
+
+### 1. Get the code and install dependencies
 
 ```bash
+git clone <your-github-repository-url>
+cd <repository-directory>
 npm install
 ```
 
-### 3. Configure environment
+### 2. Create a MySQL database
 
-```bash
-cp .env.example .env
+Create the database named `khetsetu` (or choose a different name and set `MYSQL_DATABASE` below). For example, in the MySQL client:
+
+```sql
+CREATE DATABASE khetsetu CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 ```
 
-Edit `.env` with your values:
+The application initializes its tables at server startup. The MySQL user must have permission to create tables and indexes in the selected database.
+
+### 3. Configure the backend
+
+Copy `.env.example` to `.env` and set the database credentials and a private JWT secret. Keep `.env` local; it contains credentials and is ignored by Git.
 
 ```env
+NODE_ENV=development
 PORT=5000
-MONGODB_URI=mongodb://localhost:27017/krishishetra   # or your Atlas URI
-JWT_SECRET=your_random_secret_key
-JWT_EXPIRES_IN=7d
+MYSQL_HOST=127.0.0.1
+MYSQL_PORT=3306
+MYSQL_DATABASE=khetsetu
+MYSQL_USER=root
+MYSQL_PASSWORD=your_mysql_password
+JWT_SECRET=replace_with_a_long_random_secret
+JWT_EXPIRES_IN=1d
 
-# Optional — transactional email via Brevo
-BREVO_API_KEY=your_brevo_api_key
-EMAIL_FROM=notifications@krishishetra.com
-
-# Optional — live mandi data refresh from data.gov.in
-DATA_GOV_API_KEY=your_data_gov_in_api_key
-
-# CORS allowed origins
+# Optional integrations
+BREVO_API_KEY=
+EMAIL_FROM=your_verified_sender@example.com
+EMAIL_FROM_NAME=KrishiShetra
 FRONTEND_URL=http://localhost:5000
+DATA_GOV_API_KEY=
 ```
 
-> The platform includes a **demo data fallback** — if the backend is unavailable, pages display realistic sample data automatically. You do not need a running database to explore the UI.
+`FRONTEND_URL` accepts comma-separated allowed origins. The mandi API key enables live price requests; the backend has a bundled cache for fallback/reference data. Email delivery needs a configured Brevo key and verified sender.
 
-### 4. Start
+### 4. Run the server
 
 ```bash
-# Development (nodemon auto-reload)
+# Development with automatic restart
 npm run dev
 
-# Production
+# Or start normally
 npm start
 ```
 
-### 5. Open in browser
+Open [http://localhost:5000](http://localhost:5000). The server also exposes `GET /api/health` for a basic health response. If you choose another port, use that port in the browser URL.
 
-| Page | URL |
-|---|---|
-| Landing | http://localhost:5000 |
-| Farmer Dashboard | http://localhost:5000/dashboard.html |
-| Mandi Comparison | http://localhost:5000/mandi-compare.html |
-| Buyer Marketplace | http://localhost:5000/buyer.html |
-| Transporter Portal | http://localhost:5000/transporter/dashboard.html |
-| FPO Hub | http://localhost:5000/fpo-dashboard.html |
-| Admin Suite | http://localhost:5000/admin/ |
+### Optional demo admin account
 
----
+In a non-production environment, configure `DEMO_ADMIN_EMAIL` and `DEMO_ADMIN_PASS` in `.env`, then run:
 
-## Environment Variables
+```bash
+npm run seed:admin
+```
 
-| Variable | Required | Description |
+This utility refuses to run when `NODE_ENV=production`. Use only a local development database and do not reuse demo credentials in a deployed environment.
+
+## API overview
+
+All API routes use the `/api` prefix. Protected operations generally require `Authorization: Bearer <JWT>`; access is restricted by account role where applicable.
+
+| Area | Route prefix | Purpose |
 |---|---|---|
-| `PORT` | No (default 5000) | Express server port |
-| `MONGODB_URI` | **Yes** | MongoDB connection string |
-| `JWT_SECRET` | **Yes** | Secret for signing JWTs |
-| `JWT_EXPIRES_IN` | No (default `1d`) | Token lifespan |
-| `BREVO_API_KEY` | No | Transactional email (Brevo/Sendinblue) |
-| `EMAIL_FROM` | No | Verified sender address |
-| `DATA_GOV_API_KEY` | No | data.gov.in API key for live mandi price refresh |
-| `FRONTEND_URL` | No | Comma-separated CORS allowed origins |
+| Health and auth | `/api/health`, `/api/auth` | Health, registration, login, email verification, password reset, profile |
+| Farmer and lots | `/api/farmer`, `/api/lots` | Farmer profile and produce-lot management |
+| Buyer and marketplace | `/api/buyer`, `/api/buyer/market`, `/api/buyer/saved-lots`, `/api/offers` | Buyer profile, browsing, saved lots, offers |
+| Inquiries and orders | `/api/inquiries`, `/api/orders` | Purchase inquiry, negotiation, order creation and status |
+| Market and quality | `/api/market`, `/api/quality` | Mandi prices, public lots, optional produce-quality endpoints |
+| Storage and decisions | `/api/storage`, `/api/decision` | Depots, storage requests and sell-versus-store estimate |
+| Disputes and transport | `/api/disputes`, `/api/transport` | Dispute handling and logistics workflows |
+| Notifications and activity | `/api/notifications`, `/api/activity` | User notifications and activity history |
+| Audit | `/api/audit` | Transaction audit and verification endpoints |
 
----
+For individual request/response details, see the route and controller files in `server/routes/` and `server/controllers/`.
 
-## Demo
+## Configuration reference
 
-A live deployment is available on Render. The demo mode uses pre-seeded data — no account required to explore the UI.
-
-https://krishishetra-tew1.onrender.com/
-
-> **Note:** The backend on Render may spin down after inactivity. If the first page load is slow, wait ~30 seconds for the service to wake.
-
----
-
-## Technology Stack
-
-| Layer | Technology |
+| Variable | Purpose |
 |---|---|
-| Frontend | Vanilla HTML · CSS · JavaScript (no framework) |
-| Styling | Custom CSS with design tokens (`--ks-evergreen`, `--ks-sage`, etc.) |
-| Icons | [Lucide](https://lucide.dev/) (CDN) |
-| Maps | [Leaflet.js](https://leafletjs.com/) — APMC mandi geospatial map |
-| Charts | [Chart.js](https://www.chartjs.org/) — price trend visualizations |
-| i18n | Custom system — `js/translations.js` + `js/i18n.js` |
-| Backend | [Node.js](https://nodejs.org/) + [Express](https://expressjs.com/) |
-| Database | [MongoDB](https://www.mongodb.com/) via [Mongoose](https://mongoosejs.com/) |
-| Auth | JWT (`jsonwebtoken`) + `bcryptjs` password hashing |
-| Email | [Brevo](https://brevo.com/) transactional email API |
-| Mandi Data | [data.gov.in](https://data.gov.in/) Agmarknet official dataset |
-| Hosting | [Render](https://render.com/) |
+| `PORT` | HTTP server port; defaults to `5000` in code (the sample deployment template uses `10000`) |
+| `MYSQL_HOST`, `MYSQL_PORT` | MySQL server address and port |
+| `MYSQL_DATABASE`, `MYSQL_USER`, `MYSQL_PASSWORD` | Database name and login |
+| `MYSQL_CONNECTION_LIMIT` | Optional connection pool limit |
+| `JWT_SECRET`, `JWT_EXPIRES_IN` | JWT signing secret and token lifetime |
+| `FRONTEND_URL` | Optional comma-separated CORS origins |
+| `DATA_GOV_API_KEY`, `DATA_GOV_RESOURCE_ID` | Optional data.gov.in market-data credentials/resource override |
+| `BREVO_API_KEY`, `EMAIL_FROM`, `EMAIL_FROM_NAME` | Optional transactional email configuration |
+| `ENABLE_TEST_ROUTES` | Enables test routes only outside production when set to `true` |
 
----
+## Notes and limitations
 
-## What Is and Is Not Implemented
-
-### Implemented
-- Multi-role authentication (JWT, bcrypt, role guards)
-- Farmer produce lot lifecycle (create, list, edit, cancel)
-- Buyer marketplace with filter and search
-- Multi-turn inquiry and negotiation with offer timeline
-- 6-stage order tracking with status progression
-- Mandi price comparison with freight-adjusted net margin
-- Storage booking and pledge financing request flow
-- Dispute and mediation center with FPO involvement
-- Transporter freight load discovery and trip tracking
-- FPO member management and bulk lot aggregation
-- Admin KYC, platform metrics, and system health
-- Full multilingual UI — English, Hindi, Marathi
-- Official mandi data cache from data.gov.in (daily refresh)
-- Demo data fallback for offline/no-backend exploration
-
-### Future Scope
-- Live GPS truck tracking for in-transit orders
-- UPI / payment gateway integration for in-platform escrow release
-- Voice assistant for mandi queries in Hindi and regional languages
-- Automated warehouse receipt tokenization (pledge financing backend)
-- Mobile app (React Native) for field-level offline lot creation
-
----
-
-## Project Context
-
-KrishiShetra was built as a hackathon submission addressing the real, documented challenge of agricultural price discovery and market access for Indian smallholder farmers. Every feature represents an actual implementation decision — the mandi arbitrage engine, the negotiation protocol, the multilingual support, and the role-based architecture were all chosen to reflect how agricultural trade actually works in India, not as abstract feature lists.
-
-The platform is designed to be deployable on a free-tier cloud stack (MongoDB Atlas + Render) and operable without an internet connection using the demo data fallback.
-
----
-
----
+- The local frontend demo data supports selected UI flows; persistent accounts and trade records require the backend and MySQL connection.
+- Mandi prices depend on the upstream government dataset, network availability, and cache freshness.
+- The sell/store and freight comparisons are estimates based on configured assumptions, not guaranteed returns or live freight quotes.
+- `ai-quality/` is an optional standalone service. The main Node server does not install its Python packages through `npm install`.
+- Blockchain audit code and contract sources are included under `server/services/` and `server/contracts/`; configuring external chain access is separate from the basic local setup.
 
 ## License
 
-MIT — see [LICENSE](LICENSE) for details.
-
----
-
-<div align="center">
-  <sub>Built for Indian farmers and the agricultural community.</sub>
-</div>
+No `LICENSE` file is currently included in this repository. Add one before describing this project as MIT licensed.
